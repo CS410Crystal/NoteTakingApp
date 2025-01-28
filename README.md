@@ -11,12 +11,17 @@
 - Jedidiah Gambito - TheCSjg - jgamb009@odu.edu
 
 ## How to Run (currently)
+You need Rust (cargo) installed before running the app through the source code folder.
+
 Use the command in Terminal:
 cargo tauri dev
 
+If you get "no such command: `tauri`", type this first:
+cargo install tauri-cli --version "^2.0.0" --locked
+
 ## How to Run tests
 Use the command in Terminal:
-cargo test
+cargo testc
 
 ## Tauri + Vanilla
 
