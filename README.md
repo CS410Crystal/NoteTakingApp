@@ -21,7 +21,7 @@ cargo install tauri-cli --version "^2.0.0" --locked
 
 ## How to Run tests
 Use the command in Terminal:
-cargo testc
+cargo test
 
 ## Tauri + Vanilla
 
