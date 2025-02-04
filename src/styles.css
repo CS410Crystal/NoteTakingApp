@@ -19,8 +19,10 @@
 
 .topnav {
   position: relative;
+  height: 6vh;
   background-color: darkgray;
   overflow: hidden;
+  border-radius: 10px;
 }
 
 .nav-center {
@@ -46,6 +48,7 @@
 
 .topnav button:hover {
   border-color: rgb(62, 60, 60);
+  border-width: 2px;
 }
 
 .topnav button:active {
@@ -56,8 +59,8 @@
   height: 100%;
   width: 0;
   position: fixed;
+  top: 8px;
   z-index: 1;
-  top: 0;
   left: 0;
   background-color: darkgray; 
   overflow-x: hidden;
