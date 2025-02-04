@@ -8,6 +8,14 @@ async function greet() {
   greetMsgEl.textContent = await invoke("greet", { name: greetInputEl.value });
 }
 
+function openNav() {
+  document.getElementById("theSidenav").style.width = "250px";
+}
+
+function closeNav() {
+  document.getElementById("theSidenav").style.width = "0px";
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   greetInputEl = document.querySelector("#greet-input");
   greetMsgEl = document.querySelector("#greet-msg");

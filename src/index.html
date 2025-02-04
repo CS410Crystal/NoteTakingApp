@@ -5,10 +5,40 @@
     <link rel="stylesheet" href="styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tauri App</title>
-    <script type="module" src="/main.js" defer></script>
+    <script type="text/javascript" src="main.js" defer></script>
   </head>
 
   <body>
+
+    <div class="topnav">
+
+      <div class="nav-left">
+        <button onclick="openNav()">
+          <img src="assets/more.svg" alt="more">
+        </button>
+      </div>
+
+      <div class="nav-center">
+        <h1>Note Taking app</h1>
+      </div>
+
+      <div class="nav-right">
+        <button>
+          <img src="assets/newFolder.svg" alt="newFolder">
+        </button>
+        <button>
+          <img src="assets/newNote.svg" alt="newNote">
+        </button>
+      </div>
+    </div>
+
+    <div id="theSidenav" class="sidenav">
+      <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close"></a>
+      <a href="#">Import</a>
+      <a href="#">Export</a>
+    </div>
+
+
     <main class="container">
       <h1>Welcome to Tauri</h1>
 
