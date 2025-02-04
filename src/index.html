@@ -14,7 +14,7 @@
 
       <div class="nav-left">
         <button onclick="openNav()">
-          <img src="assets/more.svg" alt="more">
+          <img src="assets/more.svg" alt="more" title="File Menu">
         </button>
       </div>
 
@@ -24,46 +24,25 @@
 
       <div class="nav-right">
         <button>
-          <img src="assets/newFolder.svg" alt="newFolder">
+          <img src="assets/newFolder.svg" alt="newFolder" title="New Folder">
         </button>
         <button>
-          <img src="assets/newNote.svg" alt="newNote">
+          <img src="assets/newNote.svg" alt="newNote" title="New Note">
         </button>
       </div>
     </div>
 
     <div id="theSidenav" class="sidenav">
-      <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close"></a>
+      <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close" title="Close"></a>
       <a href="#">Import</a>
       <a href="#">Export</a>
     </div>
 
-
+    <!-- Insert Search Bar Here -->
+     <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
     <main class="container">
-      <h1>Welcome to Tauri</h1>
-
-      <div class="row">
-        <a href="https://tauri.app" target="_blank">
-          <img src="/assets/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a
-          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"
-          target="_blank"
-        >
-          <img
-            src="/assets/javascript.svg"
-            class="logo vanilla"
-            alt="JavaScript logo"
-          />
-        </a>
-      </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
-
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
+      <p style="text-align: center;">Here will be a list of notes. Groups also exist here just like notes. <br> Maybe clicking on a group will open a tab that shows the list of saves?</p>
+      
     </main>
   </body>
 </html>

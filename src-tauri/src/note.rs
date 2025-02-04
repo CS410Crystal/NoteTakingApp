@@ -22,6 +22,7 @@ pub fn create_note(state: State<NotesState>, object: String) -> bool {
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Note {
     content: String,
+    last_updated: u64,
 }
 
 // mod tests {
