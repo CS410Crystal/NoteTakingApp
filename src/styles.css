@@ -17,6 +17,7 @@
   -webkit-text-size-adjust: 100%;
 }
 
+
 .topnav {
   position: relative;
   height: 6vh;
@@ -52,7 +53,7 @@
 }
 
 .topnav button:active {
-  background-color: rgb(62, 60, 60);
+  background-color: rgb(178, 183, 232);
 }
 
 .sidenav {
@@ -181,3 +182,143 @@ button {
     background-color: #0f0f0f69;
   }
 }
+
+
+/* JJ: START NEW CODE*/
+
+/* FOR NEW FOLDER WINDOW */
+.newFolderDialog {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(22,22,22,0.5);
+}
+
+.newFolderDialog-content {
+  width: 30%;
+  min-width: 300px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: darkgray;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.newFolderDialog-content h2 {
+  margin-bottom: 20px;
+}
+
+.newFolderDialog-content input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.newFolderDialog-content button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0e0041;
+  color: #fff;
+  cursor: pointer;
+}
+
+.newFolderDialog-content button:hover {
+  background-color: darkgreen;
+}
+
+.newFolderDialog-content button:active {
+  background-color: darkolivegreen;
+}
+
+.newFolderDialog-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+  color: darkblue;
+}
+
+.newFolderDialog-header h2 {
+  margin: 0;
+}
+
+
+/* FOR NEW NOTE WINDOW */
+.newNoteDialog {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(22,22,22,0.5);
+}
+
+.newNoteDialog-content {
+  width: 30%;
+  min-width: 300px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: darkgray;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.newNoteDialog-content h2 {
+  margin-bottom: 20px;
+}
+
+.newNoteDialog-content input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.newNoteDialog-content button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0e0041;
+  color: #fff;
+  cursor: pointer;
+}
+
+.newNoteDialog-content button:hover {
+  background-color: darkgreen;
+}
+
+.newNoteDialog-content button:active {
+  background-color: darkolivegreen;
+}
+
+.newNoteDialog-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+  color: darkblue;
+}
+
+.newNoteDialog-header h2 {
+  margin: 0;
+}
+
+/* JJ: END NEW CODE */

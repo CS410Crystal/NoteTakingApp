@@ -23,10 +23,10 @@
       </div>
 
       <div class="nav-right">
-        <button>
+        <button onclick="openNewFolderDialog()">
           <img src="assets/newFolder.svg" alt="newFolder" title="New Folder">
         </button>
-        <button>
+        <button onclick="openNewNoteDialog()">
           <img src="assets/newNote.svg" alt="newNote" title="New Note">
         </button>
       </div>
@@ -38,8 +38,33 @@
       <a href="#">Export</a>
     </div>
 
+    <!-- JJ: START NEW CODE -->
+    <!-- NEW NOTE FOLDER DIALOG -->
+    <div id="newFolderDialog" class="newFolderDialog">
+      <div class="newFolderDialog-content">
+        <span class="close" onclick="closeNewFolderDialog()">&times;</span>
+        <p>Enter the name of the new folder:</p>
+        <input type="text" id="newFolderName" name="newFolderName" placeholder="Folder Name">
+        <button onclick="createNewFolder()">Submit</button>
+        <button onclick="closeNewFolderDialog()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- NEW NOTE DIALOG-->
+    <div id="newNoteDialog" class="newNoteDialog">
+      <div class="newNoteDialog-content">
+        <span class="close" onclick="closeNewNoteDialog()">&times;</span>
+        <p>Enter the name of the new note:</p>
+        <input type="text" id="newNoteName" name="newNoteName" placeholder="Note name">
+        <button onclick="createNewNote()">Submit</button>
+        <button onclick="closeNewNoteDialog()">Cancel</button>
+      </div>
+    <!-- JJ: END NEW CODE 2/8-->
+
+
     <!-- Insert Search Bar Here -->
-     <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
+
+    <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
     <main class="container">
       <p style="text-align: center;">Here will be a list of notes. Groups also exist here just like notes. <br> Maybe clicking on a group will open a tab that shows the list of saves?</p>
       
