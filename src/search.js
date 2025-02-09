@@ -1,3 +1,6 @@
+// Enables real-time search
+// Sends user input to Rust backend
+
 const { invoke } = window.__TAURI__.core;
 
 let searchInputEl;
@@ -6,6 +9,7 @@ let searchResultsEl;
 // Handling of search input
 async function handleSearch() {
   const query = searchInputEl.value;
+  // Clears results if query is empty
   if (query.length === 0) {
     searchResultsEl.innerHTML = '';
     return;
@@ -22,7 +26,7 @@ function displayResults(notes) {
     <div class="search-result-item">
       ${note.content.substring(0, 50)}${note.content.length > 50 ? '...' : ''}
     </div>
-  `).join('');
+  `).join(''); // Convert array to HTML string
 }
 
 // Initializes on load
@@ -32,7 +36,7 @@ window.addEventListener("DOMContentLoaded", () => {
   searchInputEl.addEventListener("input", debounce(handleSearch));
 });
 
-// Update note.rs to give access to app's note storage
-// and query to enable search term from the user
+// TODO:
+// Update note.rs to add parameters such as query (search term from user)
 // Update lib.rs
 // Load search functionaly into HTML
