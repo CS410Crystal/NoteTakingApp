@@ -38,8 +38,14 @@ function closeNewNoteDialog() {
 // THOUGHTS?
 function createNewNote() {
   const noteName = document.getElementById("newNoteName").value;
-  invoke("create_new_note", { noteName }).then(() => {
-    closeNewNoteDialog();
+  if (noteName == null || noteName == "") {
+    return
+  }
+  invoke("create_note", { name: noteName }).then((response) => {
+    if (response == true) {
+      invoke("save_data")
+      closeNewNoteDialog();
+    }
   });
 }
 

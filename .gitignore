@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 *.~lock*
+.src-tauri/Cargo.lock
+# Save File
+saves.json
