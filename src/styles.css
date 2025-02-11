@@ -20,11 +20,11 @@
 
 .topnav {
   position: relative;
-  height: 6vh;
+  height: 5vh;
   background-color: darkgray;
   overflow: hidden;
   border-radius: 10px;
-  height: 3em;
+  
 }
 
 .nav-center {
