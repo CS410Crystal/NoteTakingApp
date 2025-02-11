@@ -77,8 +77,16 @@ const notes_list = document.getElementById("notes_list");
   })
 })();
 
+let edit_note = document.getElementById("edit_note")
+let edit_container = document.getElementById("edit")
+const edit_name = document.getElementById("edit-name")
+
+let currently_editing_note;
+let currently_editing_note_element;
+
 function create_note_element(note) {
   let note_element = document.createElement("div")
+  note_element.setAttribute("name",note.name)
   note_element.style.width = "200px"
   note_element.style.height = "200px"
   note_element.style.padding = "10px"
@@ -88,6 +96,31 @@ function create_note_element(note) {
   button.innerText = note.name;
   note_element.appendChild(button)
   button.classList.add("note")
+  let lastdate = document.createElement("div")
+  lastdate.innerText = timeAgo(note.last_updated)
+  button.appendChild(lastdate)
+
+  button.addEventListener("click", function() {
+    console.log(edit_container.style.display)
+    if (edit_container.style.display == "") {
+      invoke("get_note_by_name",{name: note.name}).then((response) => {
+        if (response != "note not found") {
+          let note_response = JSON.parse(response);
+          console.log(note_response)
+          edit_container.style.display = "block"
+          edit_name.innerText = "Editing Note Name: " + note_response.name;
+          currently_editing_note = note_response;
+          currently_editing_note_element = lastdate; //temporary
+          edit_note.innerText = note_response.content;
+          edit_note.value = note_response.content;
+          lastdate.innerText = timeAgo(Number(note_response.last_updated))
+        } else {
+          console.error("note not found with name: " + note.name);
+        }
+      })
+    }
+  })
+
   return note_element;
 }
 
@@ -98,3 +131,52 @@ function scaleHeight() {
   console.log("test")
 }
 window.addEventListener("resize",scaleHeight)
+
+function timeAgo(date) {
+  const now = new Date();
+  const then = new Date(date);
+
+  const seconds = Math.round((now - then) / 1000);
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.round(minutes / 60);
+  const days = Math.round(hours / 24);
+  const months = Math.round(days / 30);
+  const years = Math.round(months / 12);
+
+  if (seconds < 30) {
+    return 'just now';
+  } else if (minutes < 2) {
+    return `${seconds} seconds ago`;
+  } else if (minutes < 60) {
+    return `${minutes} minutes ago`;
+  } else if (hours < 24) {
+    return `${hours} hours ago`;
+  } else if (days < 30) {
+    return `${days} days ago`;
+  } else if (months < 12) {
+    return `${months} months ago`;
+  } else {
+    return `${years} years ago`;
+  }
+}
+
+const edit_tab_close = document.getElementById("edit-tab_close")
+edit_tab_close.addEventListener("click", function() {
+  edit_container.style.removeProperty("display")
+  edit_name.innerText = "Editing Note Name: {}";
+})
+
+const edit_save_note = document.getElementById("edit-tab-save")
+edit_save_note.addEventListener("click", function() {
+  if (currently_editing_note != null) {
+    currently_editing_note.content = edit_note.value;
+    currently_editing_note.last_updated = Date.now();
+  }
+  const object = JSON.stringify(currently_editing_note)
+  invoke("edit_note", {object}).then((response) => {
+    invoke("save_data").then((save_data_response) => {
+      console.log("success")
+      currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
+    })
+  })
+})

@@ -1,7 +1,7 @@
 ///Container for backend scripts
 mod note;
 
-use note::{create_note, get_notes, Note};
+use note::{create_note, edit_note, get_note_by_name, get_notes, Note};
 use serde_json::Value;
 use std::{fs::{self, File}, sync::Mutex};
 use tauri::State;
@@ -42,7 +42,7 @@ fn load_data(state: State<NotesState>) {
     Ok(data) => data,
     Err(_e) => {
         println!("creating new file");
-        let _f = File::create("saves.json").expect("error when creating file");
+        let _f = File::create(r"..\saves.json").expect("error when creating file");
         "".to_string()
     },
     };
@@ -74,7 +74,9 @@ pub fn run() {
             save_data,
             load_data,
             create_note,
-            get_notes
+            edit_note,
+            get_notes,
+            get_note_by_name
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

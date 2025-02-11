@@ -57,6 +57,17 @@ pub fn get_notes(state: State<NotesState>) -> String {
     return serde_json::to_string(&notes.note_list).expect("can't serialize note list");
 }
 
+#[tauri::command]
+pub fn get_note_by_name(state: State<NotesState>, name: String) -> String {
+    let notes = state.0.lock().unwrap();
+    for test_note in &notes.note_list {
+        if test_note.name == name {
+            return serde_json::to_string(&test_note).expect("can't seralize note struct");
+        }
+    }
+    return "note not found".to_string();
+}
+
 #[derive(Clone)]
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Note {

@@ -39,7 +39,6 @@
     <a href="#">Export</a>
   </div>
 
-  <!-- JJ: START NEW CODE -->
   <!-- NEW NOTE FOLDER DIALOG -->
   <div id="newFolderDialog" class="newFolderDialog">
     <div class="newFolderDialog-content" style="margin:auto; transform: translate(0%,80%);">
@@ -59,8 +58,16 @@
       <button onclick="closeNewNoteDialog()">Cancel</button>
     </div>
   </div>
-  <!-- JJ: END NEW CODE 2/8-->
 
+  <div id="edit">
+    <div id="edit-tab">
+      <div id="edit-name">Editing Note Name: {}</div>
+      <button id="edit-tab_close">Close Edit</button>
+      <button id="edit-tab-save">Save Note</button>
+      <textarea id="edit_note" style="height: 90%; width: 100%;"></textarea>
+      <button id="delete_note">Delete Note</button>
+    </div>
+  </div>
 
   <!-- Insert Search Bar Here -->
 

@@ -197,6 +197,7 @@ button {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(22,22,22,0.5);
+  display: none;
 }
 
 .newFolderDialog-content {
@@ -265,6 +266,7 @@ button {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(22,22,22,0.5);
+  display: none;
 }
 
 .newNoteDialog-content {
@@ -337,4 +339,34 @@ button {
 }
 .note:active {
   background-color: white;
+}
+
+#edit {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(22,22,22,0.5);
+  display: none;
+}
+
+#edit-tab {
+  /* position: relative; */
+  margin:auto; transform: translate(0%,10%);
+  background-color: white;
+  width: 90%;
+  height: 80%;
+  /* min-width: 300px; */
+  /* max-width: 400px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: darkgray;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
