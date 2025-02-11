@@ -77,7 +77,11 @@ pub fn run() {
             edit_note,
             get_notes,
             get_note_by_name,
-            delete_note
+            delete_note,
+            export_notes,
+            export_notes_as_pdf,
+            import_notes_from_pdf,
+            import_notes
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
