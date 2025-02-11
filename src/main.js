@@ -23,10 +23,26 @@ function closeNewFolderDialog() {
 // THOUGHTS?
 function createNewFolder() {
   const folderName = document.getElementById("newFolderName").value;
-  invoke("create_new_folder", { folderName }).then(() => {
-    closeNewFolderDialog();
-  });
+  if (!folderName.trim()) {
+    alert("Folder name cannot be empty!");
+    return;
+  }
+  invoke("create_new_folder", { folder_name: folderName })
+    .then((response) => {
+      if (response) {
+        invoke("save_data"); //  Save the folder
+        closeNewFolderDialog();
+        alert("Folder created successfully!");
+      } else {
+        alert("Folder with this name already exists!");
+      }
+    })
+    .catch((error) => {
+      console.error("Error creating folder:", error);
+      alert("Failed to create folder.");
+    });
 }
+
 
 function openNewNoteDialog() {
   document.getElementById("newNoteDialog").style.display = "block";

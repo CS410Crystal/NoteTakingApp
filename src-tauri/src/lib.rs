@@ -26,6 +26,32 @@ impl Notes {
     }
 }
 
+#[derive(serde::Deserialize, serde::Serialize)]
+pub struct Folder {
+    name: String,
+    created_at: u64,
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
+pub struct FoldersState(pub Mutex<Folders>);
+
+#[derive(serde::Deserialize, serde::Serialize)]
+pub struct Folders {
+    folder_list: Vec<Folder>,
+}
+
+impl Folders {
+    pub fn new() -> Folders {
+        return Folders {
+            folder_list: Vec::new(),
+        };
+    }
+    pub fn serial(&self) -> String {
+        return serde_json::to_string(self).expect("can't serialize folders");
+    }
+}
+
+
 //For now save as a json, figure out the other type later
 const SAVEFILE: &str = r"..\saves.json";
 
@@ -34,6 +60,35 @@ fn save_data(state: State<NotesState>) {
     let e = state.0.lock().unwrap().serial();
     fs::write(SAVEFILE, e).expect("Unable to write file");
 }
+
+#[tauri::command]
+fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
+    let mut folders = state.0.lock().unwrap();
+
+    // Prevent duplicate folder names
+    for folder in &folders.folder_list {
+        if folder.name == folder_name {
+            return false;
+        }
+    }
+
+    let new_folder = Folder {
+        name: folder_name.clone(),
+        created_at: std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_secs(),
+    };
+
+    folders.folder_list.push(new_folder);
+    
+    // Save to file
+    fs::write(SAVEFILE, folders.serial()).expect("Unable to write file");
+
+    println!("Created new folder: {}", folder_name);
+    return true;
+}
+
 
 #[tauri::command]
 fn load_data(state: State<NotesState>) {
@@ -67,9 +122,12 @@ fn load_data(state: State<NotesState>) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let notes = Notes::new();
+    let folders = Folders::new();  //  Initialize folders
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(NotesState(notes.into()))
+        .manage(FoldersState(folders.into()))  // ✅ Manage folder state
         .invoke_handler(tauri::generate_handler![
             save_data,
             load_data,
@@ -77,8 +135,10 @@ pub fn run() {
             edit_note,
             get_notes,
             get_note_by_name,
-            delete_note
+            delete_note,
+            create_new_folder  //  Register the function
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
