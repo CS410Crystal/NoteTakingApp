@@ -197,3 +197,17 @@ if (currently_editing_note == "" || currently_editing_note == null || currently_
     }
   });
 });
+// Search functionality (commented out)
+// function searchNotes() {
+//   let input = document.getElementById("searchInput").value.toLowerCase();
+//   let notes = document.querySelectorAll(".note");
+//   
+//   notes.forEach(note => {
+//     let noteName = note.innerText.toLowerCase();
+//     if (noteName.includes(input)) {
+//       note.style.display = "block";
+//     } else {
+//       note.style.display = "none";
+//     }
+//   });
+// }
