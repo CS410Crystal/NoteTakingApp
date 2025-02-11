@@ -92,7 +92,7 @@
 
 .container {
   margin: 0;
-  padding-top: 10vh;
+  padding-top: 3vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -323,3 +323,11 @@ button {
 }
 
 /* JJ: END NEW CODE */
+
+#notes_list {
+  display: grid;
+  /* height: 500px; */
+  /* height: 100%; */
+  overflow-y: auto;
+  grid-template-columns: auto auto auto;
+}

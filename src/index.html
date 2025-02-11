@@ -1,71 +1,73 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script type="text/javascript" src="main.js" defer></script>
-  </head>
 
-  <body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tauri App</title>
+  <script type="text/javascript" src="main.js" defer></script>
+</head>
 
-    <div class="topnav">
+<body>
 
-      <div class="nav-left">
-        <button onclick="openNav()">
-          <img src="assets/more.svg" alt="more" title="File Menu">
-        </button>
-      </div>
+  <div class="topnav">
 
-      <div class="nav-center">
-        <h1>Crystal Clear</h1>
-      </div>
-
-      <div class="nav-right">
-        <button onclick="openNewFolderDialog()">
-          <img src="assets/newFolder.svg" alt="newFolder" title="New Folder">
-        </button>
-        <button onclick="openNewNoteDialog()">
-          <img src="assets/newNote.svg" alt="newNote" title="New Note">
-        </button>
-      </div>
+    <div class="nav-left">
+      <button onclick="openNav()" title="File Menu">
+        <img src="assets/more.svg" alt="more">
+      </button>
     </div>
 
-    <div id="theSidenav" class="sidenav">
-      <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close" title="Close"></a>
-      <a href="#">Import</a>
-      <a href="#">Export</a>
+    <div class="nav-center">
+      <h1>Crystal Clear</h1>
     </div>
 
-    <!-- JJ: START NEW CODE -->
-    <!-- NEW NOTE FOLDER DIALOG -->
-    <div id="newFolderDialog" class="newFolderDialog">
-      <div class="newFolderDialog-content">
-        <p>Enter the name of the new folder:</p>
-        <input type="text" id="newFolderName" name="newFolderName" placeholder="Folder Name">
-        <button onclick="createNewFolder()">Submit</button>
-        <button onclick="closeNewFolderDialog()">Cancel</button>
-      </div>
+    <div class="nav-right">
+      <button onclick="openNewFolderDialog()" title="New Folder">
+        <img src="assets/newFolder.svg" alt="newFolder">
+      </button>
+      <button onclick="openNewNoteDialog()" title="New Note">
+        <img src="assets/newNote.svg" alt="newNote">
+      </button>
     </div>
+  </div>
 
-    <!-- NEW NOTE DIALOG-->
-    <div id="newNoteDialog" class="newNoteDialog">
-      <div class="newNoteDialog-content">
-        <p>Enter the name of the new note:</p>
-        <input type="text" id="newNoteName" name="newNoteName" placeholder="Note name">
-        <button onclick="createNewNote()">Submit</button>
-        <button onclick="closeNewNoteDialog()">Cancel</button>
-      </div>
-    <!-- JJ: END NEW CODE 2/8-->
+  <div id="theSidenav" class="sidenav">
+    <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close" title="Close"></a>
+    <a href="#">Import</a>
+    <a href="#">Export</a>
+  </div>
+
+  <!-- JJ: START NEW CODE -->
+  <!-- NEW NOTE FOLDER DIALOG -->
+  <div id="newFolderDialog" class="newFolderDialog">
+    <div class="newFolderDialog-content">
+      <p>Enter the name of the new folder:</p>
+      <input type="text" id="newFolderName" name="newFolderName" placeholder="Folder Name">
+      <button onclick="createNewFolder()">Submit</button>
+      <button onclick="closeNewFolderDialog()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- NEW NOTE DIALOG-->
+  <div id="newNoteDialog" class="newNoteDialog">
+    <div class="newNoteDialog-content">
+      <p>Enter the name of the new note:</p>
+      <input type="text" id="newNoteName" name="newNoteName" placeholder="Note name">
+      <button onclick="createNewNote()">Submit</button>
+      <button onclick="closeNewNoteDialog()">Cancel</button>
+    </div>
+  </div>
+  <!-- JJ: END NEW CODE 2/8-->
 
 
-    <!-- Insert Search Bar Here -->
+  <!-- Insert Search Bar Here -->
 
-    <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
-    <main class="container">
-      <p style="text-align: center;">Here will be a list of notes. Groups also exist here just like notes. <br> Maybe clicking on a group will open a tab that shows the list of saves?</p>
-      
-    </main>
-  </body>
+  <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
+  <main class="container" id="notes_list">
+
+  </main>
+</body>
+
 </html>
