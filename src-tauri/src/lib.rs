@@ -3,7 +3,7 @@ mod note;
 
 use note::{create_note, get_notes, Note};
 use serde_json::Value;
-use std::{fs, sync::Mutex};
+use std::{fs::{self, File}, sync::Mutex};
 use tauri::State;
 // use tauri::Manager;
 
@@ -38,7 +38,14 @@ fn save_data(state: State<NotesState>) {
 #[tauri::command]
 fn load_data(state: State<NotesState>) {
     let mut notes = state.0.lock().expect("could not lock mutex");
-    let file_data = fs::read_to_string(SAVEFILE).expect("should have been able to read the file");
+    let file_data = match fs::read_to_string(SAVEFILE) {
+    Ok(data) => data,
+    Err(_e) => {
+        println!("creating new file");
+        let _f = File::create("saves.json").expect("error when creating file");
+        "".to_string()
+    },
+    };
     let _result = match serde_json::from_str(&file_data){
         Ok(file) => *notes = file,
         Err(_error) => {
