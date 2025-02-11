@@ -180,3 +180,20 @@ edit_save_note.addEventListener("click", function() {
     })
   })
 })
+
+const delete_note = document.getElementById("delete_note");
+delete_note.addEventListener("click",function() {
+if (currently_editing_note == "" || currently_editing_note == null || currently_editing_note == undefined) {
+  return
+}
+  invoke("delete_note", {name: currently_editing_note.name}).then((response) => {
+    if (response == true) {
+      invoke("save_data").then((save_data_response) => {
+        edit_container.style.removeProperty("display")
+        edit_name.innerText = "Editing Note Name: {}";
+        currently_editing_note_element.parentElement.parentElement.remove();
+        currently_editing_note_element = null;
+      })
+    }
+  });
+});

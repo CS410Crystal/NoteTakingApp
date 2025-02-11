@@ -52,6 +52,27 @@ pub fn edit_note(state: State<NotesState>, object: String) -> bool {
 }
 
 #[tauri::command]
+pub fn delete_note(state: State<NotesState>, name: String) -> bool {
+    let mut notes = state.0.lock().unwrap();
+
+    let mut note_index: usize = 0;
+    let mut can_edit: bool = false;
+    for lock_note in &notes.note_list {
+        if lock_note.name == name {
+            can_edit = true;
+            break;
+        }
+        note_index += 1;
+    }
+
+    if can_edit == true {
+        notes.note_list.remove(note_index);
+        return true;
+    }
+    return false;
+}
+
+#[tauri::command]
 pub fn get_notes(state: State<NotesState>) -> String {
     let notes = state.0.lock().unwrap();
     return serde_json::to_string(&notes.note_list).expect("can't serialize note list");

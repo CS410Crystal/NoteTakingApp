@@ -1,7 +1,7 @@
 ///Container for backend scripts
 mod note;
 
-use note::{create_note, edit_note, get_note_by_name, get_notes, Note};
+use note::{create_note, delete_note, edit_note, get_note_by_name, get_notes, Note};
 use serde_json::Value;
 use std::{fs::{self, File}, sync::Mutex};
 use tauri::State;
@@ -76,7 +76,8 @@ pub fn run() {
             create_note,
             edit_note,
             get_notes,
-            get_note_by_name
+            get_note_by_name,
+            delete_note
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
