@@ -87,6 +87,7 @@ function create_note_element(note) {
   button.style.height = "200px"
   button.innerText = note.name;
   note_element.appendChild(button)
+  button.classList.add("note")
   return note_element;
 }
 

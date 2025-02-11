@@ -331,3 +331,10 @@ button {
   overflow-y: auto;
   grid-template-columns: auto auto auto;
 }
+
+.note:hover {
+  background-color: #ccc;
+}
+.note:active {
+  background-color: white;
+}
