@@ -211,6 +211,9 @@ button {
   border-radius: 10px;
   background-color: darkgray;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  animation-name: animatefade;
+  animation-duration: 0.4s
 }
 
 .newFolderDialog-content h2 {
@@ -279,6 +282,9 @@ button {
   border-radius: 10px;
   background-color: darkgray;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  animation-name: animatefade;
+  animation-duration: 0.4s
 }
 
 .newNoteDialog-content h2 {
@@ -337,4 +343,9 @@ button {
 }
 .note:active {
   background-color: white;
+}
+
+@keyframes animatefade {
+  from {opacity:0}
+  to {opacity:1}
 }
