@@ -1,5 +1,6 @@
 ///Container for backend scripts
 mod note;
+mod dbManager;
 
 use note::{create_note, delete_note, edit_note, get_note_by_name, get_notes, Note};
 use serde_json::Value;

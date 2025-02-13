@@ -2,7 +2,9 @@ use std::{alloc::System, time::{SystemTime, UNIX_EPOCH}};
 
 use tauri::State;
 
-use crate::{Notes, NotesState};
+use crate::{dbManager, Notes, NotesState};
+
+use crate::dbManager::{db_create_note, db_get_note_by_name};
 
 /**
  * Add a note to the Notes state
@@ -21,7 +23,20 @@ pub fn create_note(state: State<NotesState>, name: String) -> bool {
             return false;
         }
     }
-
+    //create connection
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    //create note in db
+    match dbManager::db_create_note(&con, &note.name, &note.content) {
+        Ok(_) => {
+            notes.note_list.push(note.clone());
+            println!("Saved new note in database: {}", name);
+        }
+        Err(e) => {
+            eprintln!("Failed to create note: {}", e);
+            return false
+        }
+    }
+    //continue with original func
     notes.note_list.push(note.clone());
     //
     println!("Saved new note: {}",name);
@@ -32,6 +47,20 @@ pub fn create_note(state: State<NotesState>, name: String) -> bool {
 #[tauri::command]
 pub fn edit_note(state: State<NotesState>, object: String) -> bool {
     let note: Note = serde_json::from_str(&object).unwrap();
+    //same but for dbNote
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNote = dbManager::db_get_note_by_name(&con, &note.name).expect("Failed to get note");
+    //edit note in db
+    match dbManager::db_edit_note(&con, dbNote.0, &note.name, &note.content) {
+        Ok(_) => {
+            println!("Edited note in database file: {}", note.name);
+        }
+        Err(e) => {
+            eprintln!("Failed to edit note: {}", e);
+            return false
+        }
+    }
+    //continue with original func
     let mut notes = state.0.lock().unwrap();
 
     let mut note_index: usize = 0;
@@ -54,7 +83,20 @@ pub fn edit_note(state: State<NotesState>, object: String) -> bool {
 #[tauri::command]
 pub fn delete_note(state: State<NotesState>, name: String) -> bool {
     let mut notes = state.0.lock().unwrap();
-
+    //same but for dbNote
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNote = dbManager::db_get_note_by_name(&con, &name).expect("Failed to get note");
+    //delete note in db
+    match dbManager::db_delete_note(&con, dbNote.0) {
+        Ok(_) => {
+            println!("Deleted note from database: {}", name);
+        }
+        Err(e) => {
+            eprintln!("Failed to delete note: {}", e);
+            return false
+        }
+    }
+    //continue with original func
     let mut note_index: usize = 0;
     let mut can_edit: bool = false;
     for lock_note in &notes.note_list {
@@ -75,6 +117,14 @@ pub fn delete_note(state: State<NotesState>, name: String) -> bool {
 #[tauri::command]
 pub fn get_notes(state: State<NotesState>) -> String {
     let notes = state.0.lock().unwrap();
+    //STILL WORKING HERE
+    //new code to get notes from db
+    // let con = dbManager::create_connection().expect("Failed to create database connection");
+    // let dbNotes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+    //return notes as string
+    //return serde_json::to_string(&dbNotes).expect("can't serialize note list");
+    //END WORK
+    //original func below
     return serde_json::to_string(&notes.note_list).expect("can't serialize note list");
 }
 
@@ -109,13 +159,3 @@ impl Note {
         };
     }
 }
-
-// mod tests {
-//     use super::create_note;
-
-//     #[test]
-//     fn test_add_note() {
-//         let note: String = "{\"content\":\"Hello World\"}"
-//         create_note(state, note);
-//     }
-// }
