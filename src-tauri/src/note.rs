@@ -159,3 +159,16 @@ impl Note {
         };
     }
 }
+
+//public functions to get the elements of Note for the dbManager
+pub  fn get_note_name(note: &Note) -> String {
+    return note.name.clone();
+}
+
+pub fn get_note_content(note: &Note) -> String {
+    return note.content.clone();
+}
+
+pub fn get_note_last_updated(note: &Note) -> u64 {
+    return note.last_updated;
+}

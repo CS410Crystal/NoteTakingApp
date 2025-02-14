@@ -120,6 +120,25 @@ fn load_data(state: State<NotesState>) {
     };
 }
 
+// NEW STILL TESTING 2/14
+// #[tauri::command]
+// fn db_load_data(state: State<NotesState>) {
+//     let mut notes = state.0.lock().expect("could not lock mutex");
+//     let con = dbManager::create_connection().expect("Failed to create database connection");
+//     let db_notes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+//     for note in db_notes {
+//         let new_note = Note {
+//             name: note.1,
+//             content: note.2,
+//             // created_at: note.3 as u64, // Convert i64 to u64
+//             last_updated: note.3 as u64, // Convert i64 to u64
+//         };
+//         notes.note_list.push(new_note);
+//     }
+// }
+// END NEW STILL TESTING 2/14
+
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let notes = Notes::new();
