@@ -232,7 +232,7 @@ if (currently_editing_note == "" || currently_editing_note == null || currently_
     }
   });
 });
-// Search functionality (commented out)
+// Search functionality
 function searchNotes() {
   let input = document.getElementById("searchInput").value.toLowerCase();
   let notes = document.querySelectorAll(".note");
