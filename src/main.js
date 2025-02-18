@@ -82,9 +82,9 @@ const notes_list = document.getElementById("notes_list");
 (function() {
   scaleHeight();
 
-  //invoke("load_data").then(() => { //load from db file now
-    invoke("load_data_from_db").then(() => {
-    invoke("get_notes_from_db").then((response) => { //was "get_notes"
+  invoke("load_data").then(() => { //load from db file now
+    // invoke("load_data_from_db").then(() => {
+    invoke("get_notes").then((response) => { //was "get_notes_from_db"
       let notes = JSON.parse(response);
       notes.sort(compare_last_updated);
       for (const note of notes) {
@@ -133,7 +133,7 @@ function create_note_element(note) {
   button.classList.add("note")
   let lastdate = document.createElement("div")
   lastdate.innerText = timeAgo(note.last_updated)
-  button.appendChild(lastdate)
+  note_element.appendChild(lastdate)
 
   button.addEventListener("click", function() {
     console.log(edit_container.style.display)
@@ -233,16 +233,16 @@ if (currently_editing_note == "" || currently_editing_note == null || currently_
   });
 });
 // Search functionality (commented out)
-// function searchNotes() {
-//   let input = document.getElementById("searchInput").value.toLowerCase();
-//   let notes = document.querySelectorAll(".note");
-//   
-//   notes.forEach(note => {
-//     let noteName = note.innerText.toLowerCase();
-//     if (noteName.includes(input)) {
-//       note.style.display = "block";
-//     } else {
-//       note.style.display = "none";
-//     }
-//   });
-// }
+function searchNotes() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let notes = document.querySelectorAll(".note");
+  
+  notes.forEach(note => {
+    let noteName = note.textContent.toLowerCase();
+    if (noteName.includes(input)) {
+      note.parentElement.style.display = "block";
+    } else {
+      note.parentElement.style.display = "none";
+    }
+  });
+}
