@@ -246,3 +246,37 @@ function searchNotes() {
     }
   });
 }
+
+/*AI: Still have to fully implement the alphabetical sort: It will display the notes by alphabetical order
+      -all it does for now is hide or show the notes depending if the checkbox is checked or not */
+function alphabetSort() {
+  let checkBox = document.getElementById("alphabetSort");
+  let notes = document.querySelectorAll(".note");
+  
+  if (checkBox.checked == true){
+    notes.forEach(note => {
+      note.parentElement.style.display = "none";
+    });
+  } else {
+     notes.forEach(note => {
+      note.parentElement.style.display = "block";
+     });
+  }
+}
+
+/*AI: Still have to fully implement the date sort: It will display the notes by newest -> oldest
+      -all it does for now is hide or show the notes depending if the checkbox is checked or not */
+function dateSort() {
+  let checkBox = document.getElementById("dateSort");
+  let notes = document.querySelectorAll(".note");
+  
+  if (checkBox.checked == true){
+    notes.forEach(note => {
+      note.parentElement.style.display = "none";
+    });
+  } else {
+     notes.forEach(note => {
+      note.parentElement.style.display = "block";
+     });
+  }
+}
