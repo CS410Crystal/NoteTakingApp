@@ -3,11 +3,14 @@ mod note;
 mod folder;
 mod dbManager;
 
-use note::{create_note, delete_note, edit_note, get_note_by_name, get_notes, Note};
+use note::{create_note, delete_note, edit_note, get_note_by_name, get_notes_from_db, Note};
 use serde_json::Value;
 use std::{fs::{self, File}, sync::Mutex};
 use tauri::State;
 // use tauri::Manager;
+//use note::get_notes_from_db;
+use note::{get_note_by_name_from_db, edit_note_in_db};
+//use dbManager::db_get_notes;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct NotesState(pub Mutex<Notes>);
@@ -99,21 +102,21 @@ fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
     return true;
 }
 ///load data from notes.db
-#[tauri::command]
-fn load_data_from_db(state: State<NotesState>) {
-    let mut notes = state.0.lock().expect("could not lock mutex");
-    let con = dbManager::create_connection().expect("Failed to create database connection");
-    let db_notes = dbManager::db_get_notes(&con).expect("Failed to get notes");
-    for note in db_notes {
-        let new_note = Note {
-            name: note.1,
-            content: note.2,
-            // created_at: note.3 as u64, // Convert i64 to u64
-            last_updated: note.3 as u64, // Convert i64 to u64
-        };
-        notes.note_list.push(new_note);
-    }
-}
+// #[tauri::command]
+// fn load_data_from_db(state: State<NotesState>) {
+//     let mut notes = state.0.lock().expect("could not lock mutex");
+//     let con = dbManager::create_connection().expect("Failed to create database connection");
+//     let db_notes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+//     for note in db_notes {
+//         let new_note = Note {
+//             name: note.1,
+//             content: note.2,
+//             // created_at: note.3 as u64, // Convert i64 to u64
+//             last_updated: note.3 as u64, // Convert i64 to u64
+//         };
+//         notes.note_list.push(new_note);
+//     }
+// }
 
 
 #[tauri::command]
@@ -154,6 +157,7 @@ fn load_data(
     }
 }
 
+//<<<<<<< HEAD
 
 // NEW STILL TESTING 2/14
 // #[tauri::command]
@@ -172,7 +176,44 @@ fn load_data(
 //     }
 // }
 // END NEW STILL TESTING 2/14
+//=======
+#[tauri::command]
+fn load_data_from_db(state: State<NotesState>) {
+    //print tried to run function               //haven't gotten here
+    println!("Tried to run load_data_from_db");
+    let mut notes = state.0.lock().expect("could not lock mutex");
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let db_notes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+    for note in db_notes {
+        let new_note = Note {
+            name: note.1,
+            content: note.2,
+            // created_at: note.3 as u64, // Convert i64 to u64
+            last_updated: note.3 as u64, // Convert i64 to u64
+        };
+        notes.note_list.push(new_note);
+    }
+    //print the loaded notes
+    for note in &notes.note_list {
+        println!("Loaded note: {}", note.name);
+    }
+}
+//>>>>>>> 605783d (testing w jed)
 
+#[tauri::command]
+fn db_get_notes(state: State<NotesState>) -> String {
+    let notes = state.0.lock().unwrap();
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let db_notes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+    let mut notes_string = String::new();
+    for note in db_notes {
+        //print each note to console
+        println!("Got From Tauri Command:\n Note ID: {}, name: {}, content: {}, created_at: {}", note.0, note.1, note.2, note.3);
+        notes_string.push_str(&format!("{:?}\n", note));
+    }
+    notes_string
+    
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -185,11 +226,11 @@ pub fn run() {
         .manage(FoldersState(folders.into()))  // ✅ Manage folder state
         .invoke_handler(tauri::generate_handler![
             save_data,
-            load_data,
+            load_data_from_db,
             create_note,
-            edit_note,
-            get_notes,
-            get_note_by_name,
+            edit_note_in_db,
+            get_notes_from_db,
+            get_note_by_name_from_db,
             delete_note,
             create_new_folder,  //  Register the function
             //new functions

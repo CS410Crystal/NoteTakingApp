@@ -55,6 +55,10 @@ pub fn db_get_notes(conn: &Connection) -> Result<Vec<(i32, String, String, i64)>
     for note in note_iter {
         notes.push(note?);
     }
+    //print the notes
+    for note in &notes {
+        println!("Got From Manager:\n Note ID: {}, name: {}, content: {}, created_at: {}", note.0, note.1, note.2, note.3);
+    }
     Ok(notes)
 }
 
@@ -73,6 +77,9 @@ pub fn db_get_note_by_name(conn: &Connection, name: &str) -> Result<(i32, String
     for note in note_iter {
         notes.push(note?);
     }
+    //print the note
+    println!("Got From Manager by Name:\n Note ID: {}, name: {}, content: {}, created_at: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
+    //return the note
     Ok(notes[0].clone())
 }
 

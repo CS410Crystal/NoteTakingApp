@@ -66,9 +66,10 @@ function createNewNote() {
   if (noteName == null || noteName == "") {
     return
   }
+  //here we need to createe the note in database (appears we're doing)
   invoke("create_note", { name: noteName }).then((response) => {
     if (response == true) {
-      invoke("save_data")
+      invoke("save_data")//save the data in db (appears we're doing)
       closeNewNoteDialog();
       // location.reload();
       let note = {
@@ -82,18 +83,22 @@ function createNewNote() {
   });
 }
 
-const notes_list = document.getElementById("notes_list");
+const notes_list = document.getElementById("notes_list");//where is notes_list defined?
 //Load Notes
 (function() {
   scaleHeight();
-
-  invoke("load_data").then(() => { //load from db file now
-    // invoke("load_data_from_db").then(() => {
-    invoke("get_notes").then((response) => { //was "get_notes_from_db"
+  //here we should be loading notes from database
+  console.log("invoke load data from db")
+  invoke("load_data_from_db").then(() => {//what does load_data do?
+    //here we should be getting notes from database
+    console.log("invoke get_notes_from_db")
+    invoke("get_notes_from_db").then((response) => {//what does get_notes do?
       let notes = JSON.parse(response);
       notes.sort(compare_last_updated);
       for (const note of notes) {
         let note_element = create_note_element(note);
+        //print the note name
+        console.log("js: "+note.name)
         notes_list.appendChild(note_element);
       }
     })
@@ -151,7 +156,7 @@ function create_note_element(note) {
   button.addEventListener("click", function() {
     console.log(edit_container.style.display)
     if (edit_container.style.display == "") {
-      invoke("get_note_by_name",{name: note.name}).then((response) => {
+      invoke("db_note_by_name",{name: note.name}).then((response) => {
         if (response != "note not found") {
           let note_response = JSON.parse(response);
           console.log(note_response)
@@ -238,15 +243,15 @@ edit_tab_close.addEventListener("click", function() {
   edit_name.innerText = "Editing Note Name: {}";
 })
 
-const edit_save_note = document.getElementById("edit-tab-save")
+const edit_save_note = document.getElementById("edit-tab-save")//
 edit_save_note.addEventListener("click", function() {
   if (currently_editing_note != null) {
     currently_editing_note.content = edit_note.value;
     currently_editing_note.last_updated = Date.now();
   }
   const object = JSON.stringify(currently_editing_note)
-  invoke("edit_note", {object}).then((response) => {
-    invoke("save_data").then((save_data_response) => {
+  invoke("edit_note_in_db", {object}).then((response) => {//change this to edit_note_in_db
+    invoke("save_data").then((save_data_response) => {//
       console.log("success")
       currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
     })

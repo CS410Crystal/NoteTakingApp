@@ -81,6 +81,23 @@ pub fn edit_note(state: State<NotesState>, object: String) -> bool {
 }
 
 #[tauri::command]
+pub fn edit_note_in_db(state: State<NotesState>, object: String) -> bool {
+    let note: Note = serde_json::from_str(&object).unwrap();
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNote = dbManager::db_get_note_by_name(&con, &note.name).expect("Failed to get note");
+    match dbManager::db_edit_note(&con, dbNote.0, &note.name, &note.content) {
+        Ok(_) => {
+            println!("Edited note in database file: {}", note.name);
+        }
+        Err(e) => {
+            eprintln!("Failed to edit note: {}", e);
+            return false
+        }
+    }
+    return true;
+}
+
+#[tauri::command]
 pub fn delete_note(state: State<NotesState>, name: String) -> bool {
     let mut notes = state.0.lock().unwrap();
     //same but for dbNote
@@ -117,15 +134,17 @@ pub fn delete_note(state: State<NotesState>, name: String) -> bool {
 #[tauri::command]
 pub fn get_notes(state: State<NotesState>) -> String {
     let notes = state.0.lock().unwrap();
-    //STILL WORKING HERE
-    //new code to get notes from db
-    // let con = dbManager::create_connection().expect("Failed to create database connection");
-    // let dbNotes = dbManager::db_get_notes(&con).expect("Failed to get notes");
-    //return notes as string
-    //return serde_json::to_string(&dbNotes).expect("can't serialize note list");
-    //END WORK
-    //original func below
+
     return serde_json::to_string(&notes.note_list).expect("can't serialize note list");
+}
+
+#[tauri::command]
+pub fn get_notes_from_db(state: State<NotesState>) -> String {
+    //print getting notes from db
+    println!("Getting notes from db");
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNotes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+    return serde_json::to_string(&dbNotes).expect("can't serialize note list");
 }
 
 #[tauri::command]
@@ -137,6 +156,14 @@ pub fn get_note_by_name(state: State<NotesState>, name: String) -> String {
         }
     }
     return "note not found".to_string();
+}
+
+#[tauri::command]
+pub fn get_note_by_name_from_db(state: State<NotesState>, name: String) -> String {
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNote = dbManager::db_get_note_by_name(&con, &name).expect("Failed to get note");
+    println!("Got note by name from db: {}", dbNote.1);
+    return serde_json::to_string(&dbNote).expect("can't serialize note struct");
 }
 
 #[derive(Clone)]
