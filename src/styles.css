@@ -20,11 +20,11 @@
 
 .topnav {
   position: relative;
-  height: 6vh;
+  height: 5vh;
   background-color: darkgray;
   overflow: hidden;
   border-radius: 10px;
-  height: 3em;
+  
 }
 
 .nav-center {
@@ -92,7 +92,7 @@
 
 .container {
   margin: 0;
-  padding-top: 10vh;
+  padding-top: 3vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -211,6 +211,9 @@ button {
   border-radius: 10px;
   background-color: darkgray;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  animation-name: animatefade;
+  animation-duration: 0.4s
 }
 
 .newFolderDialog-content h2 {
@@ -279,6 +282,9 @@ button {
   border-radius: 10px;
   background-color: darkgray;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  animation-name: animatefade;
+  animation-duration: 0.4s
 }
 
 .newNoteDialog-content h2 {
@@ -323,3 +329,23 @@ button {
 }
 
 /* JJ: END NEW CODE */
+
+#notes_list {
+  display: grid;
+  /* height: 500px; */
+  /* height: 100%; */
+  overflow-y: auto;
+  grid-template-columns: auto auto auto;
+}
+
+.note:hover {
+  background-color: #ccc;
+}
+.note:active {
+  background-color: white;
+}
+
+@keyframes animatefade {
+  from {opacity:0}
+  to {opacity:1}
+}
