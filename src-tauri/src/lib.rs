@@ -90,7 +90,7 @@ fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
     println!("Created new folder: {}", folder_name);
     return true;
 }
-///laod data from notes.db
+///load data from notes.db
 #[tauri::command]
 fn load_data_from_db(state: State<NotesState>) {
     let mut notes = state.0.lock().expect("could not lock mutex");

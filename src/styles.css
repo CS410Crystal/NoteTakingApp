@@ -21,7 +21,7 @@
 /*AI: css for top nav bar and side nav bar */
 .topnav {
   position: relative;
-  height: 5vh;
+  height: 60px;
   background-color: darkgray;
   overflow: hidden;
   border-radius: 10px;
@@ -89,6 +89,13 @@
   top: 0;
   right: 25px;
   margin-left: 50px;
+}
+
+.sidenav label {
+  padding: 8px 0px 0px 32px;
+  font-size: 20px;
+  display: inline-block;
+  color: black;
 }
 
 /* AI: End new code */
@@ -321,6 +328,7 @@ button:active {
 @keyframes animatefade {
   from {opacity:0}
   to {opacity:1}
+<<<<<<< HEAD
 }
  .search-container {
   text-align: center;
@@ -339,4 +347,6 @@ button:active {
   font-size: 25px;
   color: white;
   display: block;
+=======
+>>>>>>> 9ef8329184ffb97c03fe39320875c5082da2c883
 }
