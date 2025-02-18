@@ -86,6 +86,7 @@ const notes_list = document.getElementById("notes_list");
     invoke("load_data_from_db").then(() => {
     invoke("get_notes_from_db").then((response) => { //was "get_notes"
       let notes = JSON.parse(response);
+      notes.sort(compare_last_updated);
       for (const note of notes) {
         let note_element = create_note_element(note);
         notes_list.appendChild(note_element);
@@ -93,6 +94,23 @@ const notes_list = document.getElementById("notes_list");
     })
   })
 })();
+
+/**
+ * Compare notes by last updated
+ * Prefers to show newer notes first
+ * @param {*} a Note Object
+ * @param {*} b Note Object
+ * @returns priority number (greater means newer)
+ */
+function compare_last_updated(a,b) {
+  if (a.last_updated < b.last_updated) {
+    return 1;
+  }
+  if (a.last_updated > b.last_updated) {
+    return -1;
+  }
+  return 0;
+}
 
 let edit_note = document.getElementById("edit_note")
 let edit_container = document.getElementById("edit")
