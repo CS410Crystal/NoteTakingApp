@@ -58,10 +58,18 @@ impl Folders {
 const SAVEFILE: &str = r"..\saves.json";
 
 #[tauri::command]
-fn save_data(state: State<NotesState>) {
-    let e = state.0.lock().unwrap().serial();
-    fs::write(SAVEFILE, e).expect("Unable to write file");
+fn save_data(notes_state: State<NotesState>, folders_state: State<FoldersState>) {
+    let notes = notes_state.0.lock().unwrap();
+    let folders = folders_state.0.lock().unwrap();
+
+    let data = serde_json::json!({
+        "note_list": notes.note_list,
+        "folder_list": folders.folder_list
+    });
+
+    fs::write(SAVEFILE, data.to_string()).expect("Unable to write file");
 }
+
 
 #[tauri::command]
 fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
@@ -109,33 +117,43 @@ fn load_data_from_db(state: State<NotesState>) {
 
 
 #[tauri::command]
-fn load_data(state: State<NotesState>) {
-    let mut notes = state.0.lock().expect("could not lock mutex");
+fn load_data(
+    notes_state: State<NotesState>,
+    folders_state: State<FoldersState>
+) {
+    let mut notes = notes_state.0.lock().unwrap();
+    let mut folders = folders_state.0.lock().unwrap();
+
     let file_data = match fs::read_to_string(SAVEFILE) {
-    Ok(data) => data,
-    Err(_e) => {
-        println!("creating new file");
-        let _f = File::create(r"..\saves.json").expect("error when creating file");
-        "".to_string()
-    },
-    };
-    let _result = match serde_json::from_str(&file_data){
-        Ok(file) => *notes = file,
-        Err(_error) => {
-            println!("trying to load partial data");
-            if &file_data == "" {
-                println!("File is empty, using default data");
-                return;
-            }
-            let file_json: Value = serde_json::from_str(&file_data).expect("invalid json");
-            if let Some(field) = file_json.get("note_list") {
-                let value = serde_json::from_value(field.clone()).expect("could not extract value of note_list");
-                notes.note_list = value;
-            }
-            println!("successfully loaded partial data")
+        Ok(data) => data,
+        Err(_e) => {
+            println!("creating new file");
+            let _f = File::create(SAVEFILE).expect("error when creating file");
+            return;
         }
     };
+
+    let result: Value = match serde_json::from_str(&file_data) {
+        Ok(json) => json,
+        Err(_) => {
+            println!("invalid json, using default data");
+            return;
+        }
+    };
+
+    if let Some(note_list) = result.get("note_list") {
+        *notes = Notes {
+            note_list: serde_json::from_value(note_list.clone()).unwrap_or_default(),
+        };
+    }
+
+    if let Some(folder_list) = result.get("folder_list") {
+        *folders = Folders {
+            folder_list: serde_json::from_value(folder_list.clone()).unwrap_or_default(),
+        };
+    }
 }
+
 
 // NEW STILL TESTING 2/14
 // #[tauri::command]

@@ -97,6 +97,14 @@ const notes_list = document.getElementById("notes_list");
         notes_list.appendChild(note_element);
       }
     })
+    invoke("get_folders").then((response) => {
+      let folders = JSON.parse(response);
+      for (const folder of folders) {
+        let folder_element = create_folder_element(folder);
+        notes_list.appendChild(folder_element);
+      }
+    });
+    
   })
 })();
 
@@ -163,6 +171,30 @@ function create_note_element(note) {
 
   return note_element;
 }
+
+function create_folder_element(folder) {
+  let folder_element = document.createElement("div");
+  folder_element.classList.add("folder-item");
+  folder_element.innerText = `📁 ${folder.name}`;
+  folder_element.style.width = "200px";
+  folder_element.style.height = "50px";
+  folder_element.style.padding = "10px";
+  folder_element.style.border = "1px solid gray";
+  folder_element.style.marginBottom = "5px";
+  folder_element.style.cursor = "pointer";
+  folder_element.style.backgroundColor = "#e6e6e6";
+  folder_element.style.display = "flex";
+  folder_element.style.alignItems = "center";
+  folder_element.style.justifyContent = "center";
+
+  folder_element.addEventListener("click", function () {
+    alert(`Opening folder: ${folder.name}`);
+    // In the future: Load folder contents or navigate to folder view.
+  });
+
+  return folder_element;
+}
+
 
 function scaleHeight() {
   const windowHeight = window.innerHeight;
@@ -287,4 +319,33 @@ function dateSort() {
       note.parentElement.style.display = "block";
      });
   }
+}
+
+function showFolders() {
+  notes_list.innerHTML = ""; // Clear current notes view
+  invoke("get_folders").then((response) => {
+    let folders = JSON.parse(response);
+    if (folders.length === 0) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.innerText = "No folders available.";
+      notes_list.appendChild(emptyMessage);
+    }
+    for (const folder of folders) {
+      let folder_element = create_folder_element(folder);
+      notes_list.appendChild(folder_element);
+    }
+  });
+}
+
+
+function showNotes() {
+  notes_list.innerHTML = "";
+  invoke("get_notes").then((response) => {
+    let notes = JSON.parse(response);
+    notes.sort(compare_last_updated);
+    for (const note of notes) {
+      let note_element = create_note_element(note);
+      notes_list.appendChild(note_element);
+    }
+  });
 }
