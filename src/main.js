@@ -82,8 +82,9 @@ const notes_list = document.getElementById("notes_list");
 (function() {
   scaleHeight();
 
-  invoke("load_data").then(() => {
-    invoke("get_notes").then((response) => {
+  //invoke("load_data").then(() => { //load from db file now
+    invoke("load_data_from_db").then(() => {
+    invoke("get_notes_from_db").then((response) => { //was "get_notes"
       let notes = JSON.parse(response);
       for (const note of notes) {
         let note_element = create_note_element(note);

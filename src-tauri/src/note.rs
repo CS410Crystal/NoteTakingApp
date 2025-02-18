@@ -36,10 +36,10 @@ pub fn create_note(state: State<NotesState>, name: String) -> bool {
             return false
         }
     }
-    //continue with original func
-    notes.note_list.push(note.clone());
+    //continue with original func //commenting out
+    //notes.note_list.push(note.clone());
     //
-    println!("Saved new note: {}",name);
+    //println!("Saved new note: {}",name);
     //
     return true;
 }
@@ -142,9 +142,10 @@ pub fn get_note_by_name(state: State<NotesState>, name: String) -> String {
 #[derive(Clone)]
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Note {
-    name: String,
-    content: String,
-    last_updated: u64,
+    pub name: String,
+    pub content: String,
+    pub last_updated: u64,
+    //made public for dbManager
 }
 
 impl Note {

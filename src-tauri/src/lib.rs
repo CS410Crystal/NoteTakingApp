@@ -89,6 +89,22 @@ fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
     println!("Created new folder: {}", folder_name);
     return true;
 }
+///laod data from notes.db
+#[tauri::command]
+fn load_data_from_db(state: State<NotesState>) {
+    let mut notes = state.0.lock().expect("could not lock mutex");
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let db_notes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+    for note in db_notes {
+        let new_note = Note {
+            name: note.1,
+            content: note.2,
+            // created_at: note.3 as u64, // Convert i64 to u64
+            last_updated: note.3 as u64, // Convert i64 to u64
+        };
+        notes.note_list.push(new_note);
+    }
+}
 
 
 #[tauri::command]
