@@ -27,12 +27,17 @@ function createNewFolder() {
     alert("Folder name cannot be empty!");
     return;
   }
-  invoke("create_new_folder", { folder_name: folderName })
+  invoke("create_new_folder", { folderName })
     .then((response) => {
       if (response) {
         invoke("save_data"); //  Save the folder
         closeNewFolderDialog();
         alert("Folder created successfully!");
+        //color the file menu button to show where to find folder
+        //check if file menu is open first
+        const filemenu = document.getElementById("filemenu")
+        filemenu.style.backgroundColor = "rgb(0,255,0)"
+        console.log("test")
       } else {
         alert("Folder with this name already exists!");
       }
@@ -232,7 +237,10 @@ if (currently_editing_note == "" || currently_editing_note == null || currently_
     }
   });
 });
-// Search functionality (commented out)
+
+/**
+ * When typing in search bar, hide notes that don't match
+ */
 function searchNotes() {
   let input = document.getElementById("searchInput").value.toLowerCase();
   let notes = document.querySelectorAll(".note");

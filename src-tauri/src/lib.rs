@@ -1,5 +1,6 @@
 ///Container for backend scripts
 mod note;
+mod folder;
 mod dbManager;
 
 use note::{create_note, delete_note, edit_note, get_note_by_name, get_notes, Note};
@@ -172,7 +173,8 @@ pub fn run() {
             get_notes,
             get_note_by_name,
             delete_note,
-            create_new_folder  //  Register the function
+            create_new_folder,  //  Register the function
+            //new functions
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
