@@ -2,7 +2,9 @@ use std::{alloc::System, time::{SystemTime, UNIX_EPOCH}};
 
 use tauri::State;
 
-use crate::{Notes, NotesState};
+use crate::{dbManager, Notes, NotesState};
+
+use crate::dbManager::{db_create_note, db_get_note_by_name};
 
 /**
  * Add a note to the Notes state
@@ -21,10 +23,23 @@ pub fn create_note(state: State<NotesState>, name: String) -> bool {
             return false;
         }
     }
-
-    notes.note_list.push(note.clone());
+    //create connection
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    //create note in db
+    match dbManager::db_create_note(&con, &note.name, &note.content) {
+        Ok(_) => {
+            notes.note_list.push(note.clone());
+            println!("Saved new note in database: {}", name);
+        }
+        Err(e) => {
+            eprintln!("Failed to create note: {}", e);
+            return false
+        }
+    }
+    //continue with original func //commenting out
+    //notes.note_list.push(note.clone());
     //
-    println!("Saved new note: {}",name);
+    //println!("Saved new note: {}",name);
     //
     return true;
 }
@@ -32,6 +47,20 @@ pub fn create_note(state: State<NotesState>, name: String) -> bool {
 #[tauri::command]
 pub fn edit_note(state: State<NotesState>, object: String) -> bool {
     let note: Note = serde_json::from_str(&object).unwrap();
+    //same but for dbNote
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNote = dbManager::db_get_note_by_name(&con, &note.name).expect("Failed to get note");
+    //edit note in db
+    match dbManager::db_edit_note(&con, dbNote.0, &note.name, &note.content) {
+        Ok(_) => {
+            println!("Edited note in database file: {}", note.name);
+        }
+        Err(e) => {
+            eprintln!("Failed to edit note: {}", e);
+            return false
+        }
+    }
+    //continue with original func
     let mut notes = state.0.lock().unwrap();
 
     let mut note_index: usize = 0;
@@ -52,17 +81,71 @@ pub fn edit_note(state: State<NotesState>, object: String) -> bool {
 }
 
 #[tauri::command]
+pub fn delete_note(state: State<NotesState>, name: String) -> bool {
+    let mut notes = state.0.lock().unwrap();
+    //same but for dbNote
+    let con = dbManager::create_connection().expect("Failed to create database connection");
+    let dbNote = dbManager::db_get_note_by_name(&con, &name).expect("Failed to get note");
+    //delete note in db
+    match dbManager::db_delete_note(&con, dbNote.0) {
+        Ok(_) => {
+            println!("Deleted note from database: {}", name);
+        }
+        Err(e) => {
+            eprintln!("Failed to delete note: {}", e);
+            return false
+        }
+    }
+    //continue with original func
+    let mut note_index: usize = 0;
+    let mut can_edit: bool = false;
+    for lock_note in &notes.note_list {
+        if lock_note.name == name {
+            can_edit = true;
+            break;
+        }
+        note_index += 1;
+    }
+
+    if can_edit == true {
+        notes.note_list.remove(note_index);
+        return true;
+    }
+    return false;
+}
+
+#[tauri::command]
 pub fn get_notes(state: State<NotesState>) -> String {
     let notes = state.0.lock().unwrap();
+    //STILL WORKING HERE
+    //new code to get notes from db
+    // let con = dbManager::create_connection().expect("Failed to create database connection");
+    // let dbNotes = dbManager::db_get_notes(&con).expect("Failed to get notes");
+    //return notes as string
+    //return serde_json::to_string(&dbNotes).expect("can't serialize note list");
+    //END WORK
+    //original func below
     return serde_json::to_string(&notes.note_list).expect("can't serialize note list");
+}
+
+#[tauri::command]
+pub fn get_note_by_name(state: State<NotesState>, name: String) -> String {
+    let notes = state.0.lock().unwrap();
+    for test_note in &notes.note_list {
+        if test_note.name == name {
+            return serde_json::to_string(&test_note).expect("can't seralize note struct");
+        }
+    }
+    return "note not found".to_string();
 }
 
 #[derive(Clone)]
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Note {
-    name: String,
-    content: String,
-    last_updated: u64,
+    pub name: String,
+    pub content: String,
+    pub last_updated: u64,
+    //made public for dbManager
 }
 
 impl Note {
@@ -78,12 +161,15 @@ impl Note {
     }
 }
 
-// mod tests {
-//     use super::create_note;
+//public functions to get the elements of Note for the dbManager
+pub  fn get_note_name(note: &Note) -> String {
+    return note.name.clone();
+}
 
-//     #[test]
-//     fn test_add_note() {
-//         let note: String = "{\"content\":\"Hello World\"}"
-//         create_note(state, note);
-//     }
-// }
+pub fn get_note_content(note: &Note) -> String {
+    return note.content.clone();
+}
+
+pub fn get_note_last_updated(note: &Note) -> u64 {
+    return note.last_updated;
+}

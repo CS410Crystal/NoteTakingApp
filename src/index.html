@@ -14,13 +14,13 @@
   <div class="topnav">
 
     <div class="nav-left">
-      <button onclick="openNav()" title="File Menu">
+      <button onclick="openNav()" title="File Menu" id="filemenu">
         <img src="assets/more.svg" alt="more">
       </button>
     </div>
 
     <div class="nav-center">
-      <h1>Crystal Clear</h1>
+      <h1>Crystal Notes</h1>
     </div>
 
     <div class="nav-right">
@@ -37,9 +37,16 @@
     <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close" title="Close"></a>
     <a href="#">Import</a>
     <a href="#">Export</a>
+    <label for="alphabetSort"> Sort Alphabetically</label>
+    <input type="checkbox" id="alphabetSort" onclick="alphabetSort()"/>
+    <label for="dateSort"> Sort By Date Added</label>
+    <input type="checkbox" id="dateSort" onclick="dateSort()"/>
+    <div id="foldertitle">Folders</div>
+    <div id="folderlist">
+
+    </div>
   </div>
 
-  <!-- JJ: START NEW CODE -->
   <!-- NEW NOTE FOLDER DIALOG -->
   <div id="newFolderDialog" class="newFolderDialog">
     <div class="newFolderDialog-content" style="margin:auto; transform: translate(0%,80%);">
@@ -59,11 +66,21 @@
       <button onclick="closeNewNoteDialog()">Cancel</button>
     </div>
   </div>
-  <!-- JJ: END NEW CODE 2/8-->
 
+  <div id="edit">
+    <div id="edit-tab">
+      <div id="edit-name">Editing Note Name: {}</div>
+      <button id="edit-tab_close">Close Edit</button>
+      <button id="edit-tab-save">Save Note</button>
+      <textarea id="edit_note" style="height: 90%; width: 100%;"></textarea>
+      <button id="delete_note">Delete Note</button>
+    </div>
+  </div>
 
   <!-- Insert Search Bar Here -->
-
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="searchNotes()">
+  </div>
   <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
   <main class="container" id="notes_list">
 
