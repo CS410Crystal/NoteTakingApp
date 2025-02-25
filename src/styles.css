@@ -328,9 +328,8 @@ button:active {
 @keyframes animatefade {
   from {opacity:0}
   to {opacity:1}
-<<<<<<< HEAD
 }
- .search-container {
+search-container {
   text-align: center;
   margin: 10px 0;
 }
@@ -347,6 +346,4 @@ button:active {
   font-size: 25px;
   color: white;
   display: block;
-=======
->>>>>>> 9ef8329184ffb97c03fe39320875c5082da2c883
 }
