@@ -149,23 +149,7 @@ pub fn db_get_note_by_name(name: &str) -> Result<(i32, String, String, i64), Str
     println!("Returning note: {:?}", notes[0]);
 
     Ok(notes[0].clone())
-    // let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE name = ?1")?;
-    // let note_iter = stmt.query_map(params![name], |row| {
-    //     Ok((
-    //         row.get(0)?,
-    //         row.get(1)?,
-    //         row.get(2)?,
-    //         row.get(3)?,
-    //     ))
-    // })?;
-    // let mut notes = Vec::new();
-    // for note in note_iter {
-    //     notes.push(note?);
-    // }
-    // //print the note
-    // println!("Got From Manager by Name:\n Note ID: {}, name: {}, content: {}, created_at: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
-    // //return the note
-    // Ok(notes[0].clone())
+
 }
 
 //get note by last_updated (returns a tuple)
