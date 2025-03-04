@@ -21,21 +21,39 @@ pub fn create_connection() -> Result<Connection> {
 //create note                                                                   //this is working
 #[tauri::command]
 pub fn create_note_in_db(name: &str) -> Result<bool, String> {
+    //get the largest id in the database
     println!("name: {}", name);
     println!("Tried to run create_note_in_db");
     let conn = create_connection().map_err(|e| e.to_string())?;
+    //get the largest id in the database
+    let id = get_largest_id(&conn).map_err(|e| e.to_string())?;
+    // print the id
+    println!("Got largest id: {}", id);
+    //create the connection
     println!("Created connection");
     //print the connection
     println!("{:?}", conn);
     //get the highest id in the database
+    let _new_id: i32 = id + 1;
     conn.execute(
-        "INSERT INTO notes (name, content, created_at) VALUES (?1, ?2, ?3)",
+        "INSERT INTO notes (_new_id, name, content, created_at) VALUES (?1, ?2, ?3, ?4)",
         params![name, "content", chrono::Utc::now().timestamp()],
     ).map_err(|e| e.to_string())?;
     println!("Ran execute");
     println!("Created note in database: {}", name);
-    // save_new_note_in_db(name);
     Ok(true)
+}
+
+pub fn get_largest_id(conn: &Connection) -> Result<i32> {
+    let mut stmt = conn.prepare("SELECT id FROM notes ORDER BY id DESC LIMIT 1")?;
+    let id_iter = stmt.query_map([], |row| {
+        Ok(row.get(0)?)
+    })?;
+    let mut id = 0;
+    for id_result in id_iter {
+        id = id_result?;
+    }
+    Ok(id)
 }
 
 //don't think we need this -jj
@@ -48,6 +66,7 @@ pub fn save_new_note_in_db(name: &str) -> Result<(), String> {
         "INSERT INTO notes (name, created_at) VALUES (?1, ?3)",
         params![name, chrono::Utc::now().timestamp()],
     ).map_err(|e| e.to_string())?;
+
     println!("Saved new note in database: {}", name);
     Ok(())
 }
