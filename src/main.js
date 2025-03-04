@@ -296,6 +296,7 @@ edit_tab_close.addEventListener("click", function() {
   edit_name.innerText = "Editing Note Name: {}";
   const status = document.getElementById("edit-tab-save-status");
   status.style.setProperty("visibility", "hidden");
+  status.style.setProperty("color", "black");
 })
 
 const edit_save_note = document.getElementById("edit-tab-save")//
@@ -311,7 +312,11 @@ edit_save_note.addEventListener("click", function() {
       const status = document.getElementById("edit-tab-save-status");
       if (status.style.getPropertyValue("visibility") == "hidden") {
         status.style.setProperty("visibility", "visible");
-        
+      }
+      if (status.style.getPropertyValue("color") == "black") {
+        status.style.setProperty("color", "lime");
+      } else {
+        status.style.setProperty("color", "black");
       }
     //   currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
     // })
