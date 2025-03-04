@@ -84,8 +84,9 @@ pub fn edit_note(state: State<NotesState>, object: String) -> bool {
 #[tauri::command]
 pub fn edit_note_in_db(state: State<NotesState>, object: String) -> bool {
     println!("{}",object);
-    let note: Note = serde_json::from_str(&object).unwrap();
-
+    // let test: Value = serde_json::from_str(&object).unwrap();
+    let mut note: Note = Note::new();
+    
 
 
     let con = dbManager::create_connection().expect("Failed to create database connection");

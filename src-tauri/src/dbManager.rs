@@ -194,6 +194,10 @@ pub fn db_get_note_by_name(name: &str) -> Result<(i32, String, String, i64), Str
 
 }
 
+// fn db_get_note_by_id(id: i32) -> Result<(i32, String, String, i64), String> {
+    
+// }
+
 //get note by last_updated (returns a tuple)
 pub fn db_get_note_by_last_updated(conn: &Connection, last_updated: i64) -> Result<(i32, String, String, i64)> {
     let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE created_at = ?1")?;

@@ -75,11 +75,9 @@ function createNewNote() {
       closeNewNoteDialog();
 
       // location.reload();
-      let note = {
-        name: noteName,
-        content: "",
-        last_updated: Date.now()
-      }
+      let note = [
+        0,noteName,"",Date.now()
+      ]
       let note_element = create_note_element(note);
       notes_list.appendChild(note_element);
     }
@@ -209,7 +207,8 @@ function create_note_element(note) {
   button.addEventListener("click", function() {                                 //edit note button
     console.log(edit_container.style.display)
     if (edit_container.style.display == "") {
-      invoke("db_get_note_by_name",{name: note[1]}).then((response) => {
+      // invoke("db_get_note_by_name",{name: note[1]}).then((response) => {
+      invoke("db_get_note_by_id",{id: note[0]}).then((response) => {
         if (response != "note not found") {
           let note_response = response;
           //get elements of note from database
