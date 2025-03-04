@@ -248,6 +248,62 @@ pub fn pdf_import(state: State<NotesState>, name: String, content: String) -> bo
     true
 }
 
+#[tauri::command]
+pub fn docx_import(name: String, content_base64: String) -> Result<bool, String> {
+    use std::io::Read;
+    use zip::ZipArchive;
+    use quick_xml::Reader;
+    use quick_xml::events::Event;
+
+    // 1. Decode base64
+    let docx_bytes = base64::decode(content_base64).map_err(|e| e.to_string())?;
+
+    // 2. Unzip
+    let reader = std::io::Cursor::new(docx_bytes);
+    let mut zip = ZipArchive::new(reader).map_err(|e| e.to_string())?;
+
+    // 3. Grab the main document XML
+    let mut document_xml = String::new();
+    {
+        let mut file_in_zip = zip
+            .by_name("word/document.xml")
+            .map_err(|_| "word/document.xml not found")?;
+        file_in_zip
+            .read_to_string(&mut document_xml)
+            .map_err(|e| e.to_string())?;
+    }
+
+    // 4. Parse the XML to extract text content
+    let mut text_content = String::new();
+    let mut xml_reader = Reader::from_str(&document_xml);
+    xml_reader.trim_text(true);
+
+    //let mut buf = Vec::new();
+    loop {
+        match xml_reader.read_event() {
+            Ok(Event::Text(e)) => {
+                let t = e.unescape().map_err(|e| e.to_string())?;
+                text_content.push_str(&t);
+            }
+            Ok(Event::Eof) => break, // End of file
+            Err(e) => return Err(format!("XML read error: {}", e)),
+            _ => {}
+        }
+    }
+    // 5. Store in the DB. This is exactly like your “text_import” pattern:
+    // First, insert a new note row to get an ID:
+    let new_id = crate::dbManager::create_note_in_db(&name)
+        .map_err(|why| format!("DB insertion error: {}", why))?;
+
+    // Then update the content of that new note:
+    crate::dbManager::edit_note_in_db(new_id, &name, &text_content)
+        .map_err(|why| format!("DB content update error: {}", why))?;
+
+    // Return success
+    Ok(true)
+}
+
+
 
 
 // #[tauri::command]

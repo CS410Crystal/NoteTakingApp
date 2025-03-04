@@ -8,7 +8,7 @@ function openNav() {
 }
 
 function closeNav() {
-  document.getElementById("theSidenav").style.removeProperty("width")
+  document.getElementById("theSidenav").style.removeProperty("width");
 }
 
 // JJ: NEW CODE START:
@@ -73,12 +73,10 @@ function createNewNote() {
       //should return a string
       closeNewNoteDialog();
 
-      // location.reload();
-      let note = [
-        Number(response),noteName,"",Date.now()
-      ]
-      let note_element = create_note_element(note);
-      notes_list.appendChild(note_element);
+    // Append new note element
+    let note = [Number(response), noteName, "", Date.now()];
+    let note_element = create_note_element(note);
+    notes_list.appendChild(note_element);
   });
 }
 
@@ -87,13 +85,11 @@ const notes_list = document.getElementById("notes_list");//where is notes_list d
 // JJ: NEW CODE START
 function loadNotes() {
   scaleHeight();
-  //here we should be loading notes from database
-  console.log("invoke load data from db")
+  console.log("invoke load_data_from_db");
   invoke("load_data_from_db").then(() => {
-    //here we should be getting notes from database
-    console.log("invoke get_notes_from_db")
+    console.log("invoke get_notes_from_dbManager");
     invoke("get_notes_from_dbManager").then((response) => {
-      console.log(response)
+      console.log(response);
       for (const note of response) {
         let note_element = create_note_element(note);
         notes_list.appendChild(note_element);
@@ -169,91 +165,6 @@ function compare_last_updated(a,b) {
   return 0;
 }
 
-let edit_note = document.getElementById("edit_note")
-let edit_container = document.getElementById("edit")
-const edit_name = document.getElementById("edit-name")
-
-let currently_editing_note;
-let currently_editing_note_element;
-
-/**
- * 
- * @param {
- * 0: id
- * 1: name
- * 2: content
- * 3: last_updated
- * } note 
- * @returns object
- */
-function create_note_element(note) {
-  console.log(note)
-  let note_element = document.createElement("div")
-  note_element.setAttribute("name",note[1])
-  note_element.style.width = "200px"
-  note_element.style.height = "200px"
-  note_element.style.padding = "10px"
-  let button = document.createElement("button")
-  button.style.width = "200px"
-  button.style.height = "200px"
-  button.innerText = note[1];
-  note_element.appendChild(button)
-  button.classList.add("note")
-  let lastdate = document.createElement("div")
-  lastdate.innerText = timeAgo(note[3]*1000)
-  note_element.appendChild(lastdate)
-
-  button.addEventListener("click", function() {                                 //edit note button
-    console.log(edit_container.style.display)
-    if (edit_container.style.display == "") {
-      // invoke("db_get_note_by_name",{name: note[1]}).then((response) => {
-      invoke("db_get_note_by_id",{id: note[0]}).then((response) => {
-        if (response != "note not found") {
-          let note_response = response;
-          //get elements of note from database
-          
-          console.log(note_response)
-          edit_container.style.display = "block"
-          edit_name.innerText = "Editing Note Name: " + note_response[1];
-          currently_editing_note = note_response;
-          currently_editing_note_element = lastdate; //temporary
-          edit_note.innerText = note_response[2];
-          edit_note.value = note_response[2];
-          lastdate.innerText = timeAgo(Number(note_response[3])*1000)
-        } else {
-          console.error("note not found with name: " + note.name);
-        }
-      })
-    }
-  })
-
-  return note_element;
-}
-
-function create_folder_element(folder) {
-  let folder_element = document.createElement("div");
-  folder_element.classList.add("folder-item");
-  folder_element.innerText = `📁 ${folder.name}`;
-  folder_element.style.width = "200px";
-  folder_element.style.height = "50px";
-  folder_element.style.padding = "10px";
-  folder_element.style.border = "1px solid gray";
-  folder_element.style.marginBottom = "5px";
-  folder_element.style.cursor = "pointer";
-  folder_element.style.backgroundColor = "#e6e6e6";
-  folder_element.style.display = "flex";
-  folder_element.style.alignItems = "center";
-  folder_element.style.justifyContent = "center";
-
-  folder_element.addEventListener("click", function () {
-    alert(`Opening folder: ${folder.name}`);
-    // In the future: Load folder contents or navigate to folder view.
-  });
-
-  return folder_element;
-}
-
-
 function scaleHeight() {
   const windowHeight = window.innerHeight;
   const desiredHeight = windowHeight*.85
@@ -290,110 +201,164 @@ function timeAgo(date) {
   }
 }
 
-const edit_tab_close = document.getElementById("edit-tab_close")
-edit_tab_close.addEventListener("click", function() {
-  edit_container.style.removeProperty("display")
+let edit_note = document.getElementById("edit_note");
+let edit_container = document.getElementById("edit");
+const edit_name = document.getElementById("edit-name");
+
+let currently_editing_note;
+let currently_editing_note_element;
+
+const edit_tab_close = document.getElementById("edit-tab_close");
+edit_tab_close.addEventListener("click", function () {
+  edit_container.style.removeProperty("display");
   edit_name.innerText = "Editing Note Name: {}";
   const status = document.getElementById("edit-tab-save-status");
   status.style.setProperty("visibility", "hidden");
   status.style.setProperty("color", "black");
-})
+});
 
-const edit_save_note = document.getElementById("edit-tab-save")//
-edit_save_note.addEventListener("click", function() {
+const edit_save_note = document.getElementById("edit-tab-save");
+edit_save_note.addEventListener("click", function () {
   if (currently_editing_note != null) {
     currently_editing_note[2] = edit_note.value;
     currently_editing_note[3] = Date.now();
   }
-  const object = JSON.stringify(currently_editing_note)
-  invoke("edit_note_in_db", {object}).then((response) => {                      //change this to edit_note_in_db
-    // invoke("save_data_to_db").then((save_data_response) => {                    //may need to add response here
-      console.log("success")
-      const status = document.getElementById("edit-tab-save-status");
-      if (status.style.getPropertyValue("visibility") == "hidden") {
-        status.style.setProperty("visibility", "visible");
-      }
-      if (status.style.getPropertyValue("color") == "black") {
-        status.style.setProperty("color", "lime");
-      } else {
-        status.style.setProperty("color", "black");
-      }
-    //   currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
-    // })
-  })
-})
-
-const delete_note = document.getElementById("delete_note");
-delete_note.addEventListener("click",function() {
-if (currently_editing_note == "" || currently_editing_note == null || currently_editing_note == undefined) {
-  return
-}
-  invoke("delete_note", {id: currently_editing_note[0]}).then((response) => {
-    console.log(response)
-    if (response == true) {
-      // invoke("save_data_to_db").then((save_data_response) => {                  //may need to add response here
-        edit_container.style.removeProperty("display")
-        edit_name.innerText = "Editing Note Name: {}";
-        currently_editing_note_element.parentElement.remove();
-        currently_editing_note_element = null;
-      // })
+  const object = JSON.stringify(currently_editing_note);
+  invoke("edit_note_in_db", { object }).then((response) => {
+    console.log("success");
+    const status = document.getElementById("edit-tab-save-status");
+    if (status.style.getPropertyValue("visibility") === "hidden") {
+      status.style.setProperty("visibility", "visible");
+    }
+    if (status.style.getPropertyValue("color") === "black") {
+      status.style.setProperty("color", "lime");
+    } else {
+      status.style.setProperty("color", "black");
     }
   });
 });
 
-/**
- * When typing in search bar, hide notes that don't match
- */
-function searchNotes() {
-  let input = document.getElementById("searchInput").value.toLowerCase();
-  let notes = document.querySelectorAll(".note");
-  
-  notes.forEach(note => {
-    let noteName = note.textContent.toLowerCase();
-    if (noteName.includes(input)) {
-      note.parentElement.style.display = "block";
-    } else {
-      note.parentElement.style.display = "none";
+const delete_note_btn = document.getElementById("delete_note");
+delete_note_btn.addEventListener("click", function () {
+  if (!currently_editing_note) {
+    return;
+  }
+  invoke("delete_note", { id: currently_editing_note[0] }).then((response) => {
+    if (response === true) {
+      edit_container.style.removeProperty("display");
+      edit_name.innerText = "Editing Note Name: {}";
+      currently_editing_note_element.parentElement.remove();
+      currently_editing_note_element = null;
     }
   });
+});
+
+// Creating elements for notes/folders in the main list
+function create_note_element(note) {
+  // note: [id, name, content, last_updated]
+  let note_element = document.createElement("div");
+  note_element.setAttribute("name", note[1]);
+  note_element.style.width = "200px";
+  note_element.style.height = "200px";
+  note_element.style.padding = "10px";
+
+  let button = document.createElement("button");
+  button.style.width = "200px";
+  button.style.height = "200px";
+  button.innerText = note[1];
+  note_element.appendChild(button);
+  button.classList.add("note");
+
+  let lastdate = document.createElement("div");
+  // PDF vs text notes might store last_updated differently
+  // If it’s stored in seconds, multiply by 1000 if needed
+  // For consistency, let's do:
+  lastdate.innerText = timeAgo(note[3]);
+  note_element.appendChild(lastdate);
+
+  // If content is PDF, display PDF; otherwise, open text editor
+  if (typeof note[2] === "string" && note[2].startsWith("data:application/pdf")) {
+    button.addEventListener("click", function() {
+      displayPDFData(note); // pass entire note so we can also delete it
+    });
+  } else {
+    // normal text note
+    button.addEventListener("click", function() {
+      invoke("db_get_note_by_id", { id: note[0] }).then((response) => {
+        if (response !== "note not found") {
+          let note_response = response;
+          edit_container.style.display = "block";
+          edit_name.innerText = "Editing Note Name: " + note_response[1];
+          currently_editing_note = note_response;
+          currently_editing_note_element = lastdate;
+          edit_note.innerText = note_response[2];
+          edit_note.value = note_response[2];
+          lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
+        } else {
+          console.error("Note not found with name: " + note[1]);
+        }
+      });
+    });
+  }
+
+  return note_element;
 }
 
-/*AI: Still have to fully implement the alphabetical sort: It will display the notes by alphabetical order
-      -all it does for now is hide or show the notes depending if the checkbox is checked or not */
+function create_folder_element(folder) {
+  let folder_element = document.createElement("div");
+  folder_element.classList.add("folder-item");
+  folder_element.innerText = `📁 ${folder.name}`;
+  folder_element.style.width = "200px";
+  folder_element.style.height = "50px";
+  folder_element.style.padding = "10px";
+  folder_element.style.border = "1px solid gray";
+  folder_element.style.marginBottom = "5px";
+  folder_element.style.cursor = "pointer";
+  folder_element.style.backgroundColor = "#e6e6e6";
+  folder_element.style.display = "flex";
+  folder_element.style.alignItems = "center";
+  folder_element.style.justifyContent = "center";
+
+  folder_element.addEventListener("click", function () {
+    alert(`Opening folder: ${folder.name}`);
+  });
+
+  return folder_element;
+}
+
+// Sorting / Searching
 function alphabetSort() {
   let checkBox = document.getElementById("alphabetSort");
   let notes = document.querySelectorAll(".note");
   
-  if (checkBox.checked == true){
+  if (checkBox.checked === true){
     notes.forEach(note => {
       note.parentElement.style.display = "none";
     });
   } else {
-     notes.forEach(note => {
+    notes.forEach(note => {
       note.parentElement.style.display = "block";
-     });
+    });
   }
 }
 
-/*AI: Still have to fully implement the date sort: It will display the notes by newest -> oldest
-      -all it does for now is hide or show the notes depending if the checkbox is checked or not */
 function dateSort() {
   let checkBox = document.getElementById("dateSort");
   let notes = document.querySelectorAll(".note");
   
-  if (checkBox.checked == true){
+  if (checkBox.checked === true){
     notes.forEach(note => {
       note.parentElement.style.display = "none";
     });
   } else {
-     notes.forEach(note => {
+    notes.forEach(note => {
       note.parentElement.style.display = "block";
-     });
+    });
   }
 }
 
 function showFolders() {
-  notes_list.innerHTML = ""; // Clear current notes view
+  notes_list.innerHTML = "";
   invoke("get_folders").then((response) => {
     let folders = JSON.parse(response);
     if (folders.length === 0) {
@@ -408,59 +373,111 @@ function showFolders() {
   });
 }
 
-
 function showNotes() {
   console.log("showNotes");
   notes_list.innerHTML = "";
   invoke("get_notes_from_db_main_display").then((response) => {
-    //let notes = JSON.parse(response);
-    //let notes equal list of notes with their names and last updated from the database
-
-
-    console.log(notes);
-    notes.sort(compare_last_updated);
-    for (const note of notes) {
-      let note_element = create_note_element(note);
+    // This returns an array of [name, last_updated], so handle accordingly:
+    // e.g. let notes = response.map( ... ) or adapt as needed
+    console.log(response);
+    response.sort((a, b) => b[1] - a[1]); // Sort by last_updated desc
+    for (const note of response) {
+      // If you need [id, name, content, last_updated], you'll need a different call
+      // For demonstration, just create a placeholder with name
+      // and note[1] as "last_updated"
+      let placeholder = [
+        Date.now(), // dummy ID
+        note[0],    // name
+        "",         // content
+        note[1]     // last_updated
+      ];
+      let note_element = create_note_element(placeholder);
       notes_list.appendChild(note_element);
     }
   });
-
 }
 
+function searchNotes() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let notes = document.querySelectorAll(".note");
+  
+  notes.forEach(note => {
+    let noteName = note.textContent.toLowerCase();
+    if (noteName.includes(input)) {
+      note.parentElement.style.display = "block";
+    } else {
+      note.parentElement.style.display = "none";
+    }
+  });
+}
+
+// File Import function – handles .txt, .pdf, .docx
 function importFile() {
   const input = document.createElement("input");
-  // Now accepts PDFs in addition to text-based files
   input.accept = ".txt,.md,.doc,.docx,.pdf";
   input.type = "file";
+
   input.onchange = function(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const fileName = file.name.split('.').slice(0, -1).join('.');
+
     if (file.name.toLowerCase().endsWith(".pdf")) {
-      // Read PDF file as data URL
+      // PDF Path:
       const reader = new FileReader();
       reader.onload = function(e) {
         const dataUrl = e.target.result;
-        // Call new Tauri command "pdf_import" to save the PDF note
-        invoke("pdf_import", { name: fileName, content: dataUrl }).then((response) => {
-          if (response) {
-            // Add a new note element that will open the PDF viewer when clicked
-            let importedNote = [Date.now(), fileName, dataUrl, Date.now()];
-            let note_element = create_note_element(importedNote);
-            notes_list.appendChild(note_element);
-            alert("PDF imported successfully as a note!");
-          } else {
-            alert("A note with this name already exists!");
-          }
-        }).catch((error) => {
-          console.error("Error importing PDF:", error);
-          alert("Failed to import PDF file.");
-        });
+        invoke("pdf_import", { name: fileName, content: dataUrl })
+          .then((response) => {
+            if (response) {
+              let importedNote = [Date.now(), fileName, dataUrl, Date.now()];
+              let note_element = create_note_element(importedNote);
+              notes_list.appendChild(note_element);
+              alert("PDF imported successfully as a note!");
+            } else {
+              alert("A note with this name already exists!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error importing PDF:", error);
+            alert("Failed to import PDF file.");
+          });
       };
       reader.readAsDataURL(file);
+    } else if (file.name.toLowerCase().endsWith(".docx")) {
+      // DOCX Path:
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        // Convert to base64
+        const base64String = btoa(binary);
+        // Call Tauri command docx_import
+        invoke("docx_import", {
+          name: fileName,
+          contentBase64: base64String
+        }).then((ok) => {
+          if (!ok) {
+            alert("A note with this name may already exist, or an error occurred.");
+            return;
+          }
+          alert("DOCX imported successfully!");
+          let docxNote = [Date.now(), fileName, "", Date.now()];
+          let note_element = create_note_element(docxNote);
+          notes_list.appendChild(note_element);
+        }).catch((error) => {
+          console.error("Error importing DOCX:", error);
+          alert("Failed to import DOCX file.");
+        });
+      };
+      reader.readAsArrayBuffer(file);
     } else {
-      // Existing handling for text-based files
+      // text-based path (.txt, .md, .doc)
       const reader = new FileReader();
       reader.onload = function(e) {
         const fileContent = e.target.result;
@@ -469,19 +486,26 @@ function importFile() {
           content: fileContent,
           last_updated: Date.now()
         };
-        invoke("text_import", { name: importedNote.name, content: importedNote.content }).then((response) => {
-          if (response) {
-            invoke("save_data");
-            let note_element = create_note_element(importedNote);
-            notes_list.appendChild(note_element);
-            alert("File imported successfully as a note!");
-          } else {
-            alert("A note with this name already exists!");
-          }
-        }).catch((error) => {
-          console.error("Error importing file:", error);
-          alert("Failed to import file.");
-        });
+        invoke("text_import", { name: importedNote.name, content: importedNote.content })
+          .then((response) => {
+            if (response) {
+              invoke("save_data"); // optional, if you use a separate Tauri command
+              let note_element = create_note_element([
+                Date.now(),
+                importedNote.name,
+                importedNote.content,
+                importedNote.last_updated
+              ]);
+              notes_list.appendChild(note_element);
+              alert("File imported successfully as a note!");
+            } else {
+              alert("A note with this name already exists!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error importing file:", error);
+            alert("Failed to import file.");
+          });
       };
       reader.readAsText(file);
     }
@@ -489,77 +513,82 @@ function importFile() {
   input.click();
 }
 
-// Update note creation so PDF notes are handled differently
-function create_note_element(note) {
-  // note: [id, name, content, last_updated]
-  let note_element = document.createElement("div");
-  note_element.setAttribute("name", note[1]);
-  note_element.style.width = "200px";
-  note_element.style.height = "200px";
-  note_element.style.padding = "10px";
-  
-  let button = document.createElement("button");
-  button.style.width = "200px";
-  button.style.height = "200px";
-  button.innerText = note[1];
-  note_element.appendChild(button);
-  button.classList.add("note");
-  
-  let lastdate = document.createElement("div");
-  lastdate.innerText = timeAgo(note[3]);
-  note_element.appendChild(lastdate);
+// PDF Viewing & Deletion
+let currently_viewing_pdf_note = null;
 
-  // Check if the note's content is a PDF (data URL will start with "data:application/pdf")
-  if (typeof note[2] === "string" && note[2].startsWith("data:application/pdf")) {
-    button.addEventListener("click", function() {
-      displayPDFData(note[2]);
-    });
-  } else {
-    button.addEventListener("click", function() {
-      invoke("db_get_note_by_id", { id: note[0] }).then((response) => {
-        if (response != "note not found") {
-          let note_response = response;
-          // existing text note editing behavior…
-          edit_container.style.display = "block";
-          edit_name.innerText = "Editing Note Name: " + note_response[1];
-          currently_editing_note = note_response;
-          currently_editing_note_element = lastdate;
-          edit_note.innerText = note_response[2];
-          edit_note.value = note_response[2];
-          lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
-        } else {
-          console.error("note not found with name: " + note[1]);
-        }
-      });
-    });
-  }
-  return note_element;
-}
-
-// Function to display a PDF note using PDF.js
-function displayPDFData(dataUrl) {
+/**
+ * displayPDFData(note):
+ *  note is [id, name, content (dataUrl), last_updated]
+ */
+function displayPDFData(note) {
+  // Save the note array globally in case we want to delete it
+  currently_viewing_pdf_note = note;
+  // Show the modal
   document.getElementById("pdfViewerModal").style.display = "block";
+
+  // Clear out any canvases from a previous PDF
+  const pagesContainer = document.getElementById("pdfPagesContainer");
+  pagesContainer.innerHTML = "";
+
+  // Retrieve the data URL we stored in note[2]
+  const dataUrl = note[2];
   const loadingTask = pdfjsLib.getDocument(dataUrl);
-  loadingTask.promise.then(function(pdf) {
-    // For this example, display the first page
-    pdf.getPage(1).then(function(page) {
-      const scale = 1.5;
-      const viewport = page.getViewport({ scale: scale });
-      const canvas = document.getElementById("pdfCanvas");
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport
-      };
-      page.render(renderContext);
-    });
-  }, function (reason) {
-    console.error(reason);
+
+  loadingTask.promise.then(function (pdf) {
+    // pdf.numPages tells us how many pages are in the PDF
+    console.log("PDF loaded, total pages = " + pdf.numPages);
+
+    // Loop through all pages
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      pdf.getPage(pageNum).then(function (page) {
+        // Create a new canvas for *each* page
+        const canvas = document.createElement("canvas");
+        pagesContainer.appendChild(canvas);
+
+        // Set up the 2D context
+        const context = canvas.getContext("2d");
+
+        // You can adjust 'scale' if you want bigger or smaller pages
+        const scale = 1.2;
+        const viewport = page.getViewport({ scale });
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // Render the page into this canvas
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+        page.render(renderContext);
+      });
+    }
+  }).catch(function (error) {
+    console.error("Error loading PDF:", error);
   });
 }
 
+// Closes the PDF modal
 function closePDFViewer() {
   document.getElementById("pdfViewerModal").style.display = "none";
+  currently_viewing_pdf_note = null;
 }
+
+// Hook up the PDF delete button
+document.getElementById("deletePdfButton").addEventListener("click", function() {
+  if (!currently_viewing_pdf_note) return;
+  const noteId = currently_viewing_pdf_note[0];
+  
+  invoke("delete_note", { id: noteId }).then((response) => {
+    if (response === true) {
+      // remove the note tile from the DOM
+      const noteTile = document.querySelector(`div[name='${currently_viewing_pdf_note[1]}']`);
+      if (noteTile && noteTile.parentElement) {
+        noteTile.parentElement.remove();
+      }
+      closePDFViewer();
+    }
+  }).catch((err) => {
+    console.error("Failed to delete PDF note:", err);
+  });
+});
