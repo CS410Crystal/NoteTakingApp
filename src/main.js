@@ -30,7 +30,7 @@ function createNewFolder() {
   invoke("create_new_folder", { folderName })
     .then((response) => {
       if (response) {
-        invoke("save_data"); //  Save the folder
+        invoke("save_data_to_database"); //  Save the folder
         closeNewFolderDialog();
         alert("Folder created successfully!");
         //color the file menu button to show where to find folder
@@ -62,15 +62,18 @@ function closeNewNoteDialog() {
  * @returns null
  */
 function createNewNote() {
+  console.log("createNewNote");
   const noteName = document.getElementById("newNoteName").value;
   if (noteName == null || noteName == "") {
     return
   }
   //here we need to createe the note in database (appears we're doing)
-  invoke("create_note", { name: noteName }).then((response) => {
+  invoke("create_note_in_db", { name: noteName }).then((response) => {
     if (response == true) {
-      invoke("save_data")//save the data in db (appears we're doing)
+      invoke("save_new_note_in_db")//save the data in db (appears we're doing)
+      //should return a string
       closeNewNoteDialog();
+
       // location.reload();
       let note = {
         name: noteName,
@@ -85,15 +88,17 @@ function createNewNote() {
 
 const notes_list = document.getElementById("notes_list");//where is notes_list defined?
 //Load Notes
-(function() {
+// JJ: NEW CODE START
+function loadNotes() {
   scaleHeight();
   //here we should be loading notes from database
   console.log("invoke load data from db")
-  invoke("load_data_from_db").then(() => {//what does load_data do?
+  invoke("load_data_from_db").then(() => {
     //here we should be getting notes from database
     console.log("invoke get_notes_from_db")
-    invoke("get_notes_from_db").then((response) => {//what does get_notes do?
-      let notes = JSON.parse(response);
+    invoke("get_notes_from_dbManager").then((response) => {
+
+      let notes = JSON.parse(response); //not json
       notes.sort(compare_last_updated);
       for (const note of notes) {
         let note_element = create_note_element(note);
@@ -111,7 +116,41 @@ const notes_list = document.getElementById("notes_list");//where is notes_list d
     });
     
   })
-})();
+}
+
+loadNotes();
+
+//open edit note dialog
+function openEditNoteDialog() {
+  document.getElementById("editNoteDialog").style.display = "block";
+}
+
+function closeEditNoteDialog() {
+  document.getElementById("editNoteDialog").style.display = "none";
+}
+
+function editNote() {
+  openEditNoteDialog();
+  console.log("editNote");
+  const noteName = document.getElementById("editNoteName").value;
+  if (noteName == null || noteName == "") {
+    return
+  }
+  //here we need to createe the note in database (appears we're doing)
+  invoke("edit_note_in_db", { name: noteName }).then((response) => {
+    if (response == true) {
+      invoke("save_data_to_db")//save the data in db (appears we're doing)
+      //should return a string
+      closeEditNoteDialog();
+      location.reload();
+    }
+  });
+}
+
+// JJ: NEW CODE END
+//load and display notes on main screen
+
+
 
 /**
  * Compare notes by last updated
@@ -153,12 +192,14 @@ function create_note_element(note) {
   lastdate.innerText = timeAgo(note.last_updated)
   note_element.appendChild(lastdate)
 
-  button.addEventListener("click", function() {
+  button.addEventListener("click", function() {                                 //edit note button
     console.log(edit_container.style.display)
     if (edit_container.style.display == "") {
-      invoke("db_note_by_name",{name: note.name}).then((response) => {
+      invoke("db_get_note_by_name",{name: note.name}).then((response) => {
         if (response != "note not found") {
           let note_response = JSON.parse(response);
+          //get elements of note from database
+          
           console.log(note_response)
           edit_container.style.display = "block"
           edit_name.innerText = "Editing Note Name: " + note_response.name;
@@ -250,11 +291,11 @@ edit_save_note.addEventListener("click", function() {
     currently_editing_note.last_updated = Date.now();
   }
   const object = JSON.stringify(currently_editing_note)
-  invoke("edit_note_in_db", {object}).then((response) => {//change this to edit_note_in_db
-    invoke("save_data").then((save_data_response) => {//
-      console.log("success")
-      currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
-    })
+  invoke("edit_note_in_db", {object}).then((response) => {                      //change this to edit_note_in_db
+    // invoke("save_data_to_db").then((save_data_response) => {                    //may need to add response here
+    //   console.log("success")
+    //   currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
+    // })
   })
 })
 
@@ -265,7 +306,7 @@ if (currently_editing_note == "" || currently_editing_note == null || currently_
 }
   invoke("delete_note", {name: currently_editing_note.name}).then((response) => {
     if (response == true) {
-      invoke("save_data").then((save_data_response) => {
+      invoke("save_data_to_db").then((save_data_response) => {                  //may need to add response here
         edit_container.style.removeProperty("display")
         edit_name.innerText = "Editing Note Name: {}";
         currently_editing_note_element.parentElement.parentElement.remove();
@@ -344,13 +385,19 @@ function showFolders() {
 
 
 function showNotes() {
+  console.log("showNotes");
   notes_list.innerHTML = "";
-  invoke("get_notes").then((response) => {
-    let notes = JSON.parse(response);
+  invoke("get_notes_from_db_main_display").then((response) => {
+    //let notes = JSON.parse(response);
+    //let notes equal list of notes with their names and last updated from the database
+
+
+    console.log(notes);
     notes.sort(compare_last_updated);
     for (const note of notes) {
       let note_element = create_note_element(note);
       notes_list.appendChild(note_element);
     }
   });
+
 }
