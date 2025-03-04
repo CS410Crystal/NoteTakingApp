@@ -215,6 +215,23 @@ pub fn db_get_note_by_last_updated(conn: &Connection, last_updated: i64) -> Resu
     }
     Ok(notes[0].clone())
 }
+//get note by id 
+pub fn db_get_note_by_id(conn: &Connection, id: i32) -> Result<(i32, String, String, i64)> {
+    let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE id = ?1")?;
+    let note_iter = stmt.query_map(params![id], |row| {
+        Ok((
+            row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+            row.get(3)?,
+        ))
+    })?;
+    let mut notes = Vec::new();
+    for note in note_iter {
+        notes.push(note?);
+    }
+    Ok(notes[0].clone())
+}
 
 pub fn to_string(conn: &Connection) -> String {
     let notes = get_notes_from_dbManager().expect("Failed to get notes");
