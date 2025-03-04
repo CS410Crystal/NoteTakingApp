@@ -73,29 +73,13 @@
     <div id="edit-tab">
       <div id="edit-name">Editing Note Name: {}</div>
       <button id="edit-tab_close">Close Edit</button>
-      <button id="edit-tab-save">Save Note</button>
+      <button id="edit-tab-save">Save Note</button><span id="edit-tab-save-status" style="color:lime; visibility: hidden;">Saved!</span>
       <textarea id="edit_note" style="height: 90%; width: 100%;"></textarea>
       <button id="delete_note">Delete Note</button>
     </div>
   </div>
 
-  <!-- implement edit note dialog -->
-  <!-- <div id="editNoteDialog" class="editNoteDialog">
-    <div class="editNoteDialog-content" style="margin:auto; transform: translate(0%,80%);">
-      <input type="text" id="editNoteName" name="editNoteName" placeholder="Note name">
-      <button onclick="editNote()">Submit</button>
-      <button onclick="closeEditNoteDialog()">Cancel</button>
-    </div> -->
-
-    <!-- edit note dialog but only show when one of the note buttons is clicked on the main screen -->
-    <!-- <div id="editNoteDialog" class="editNoteDialog">
-      <div class="editNoteDialog-content" style="margin:auto; transform: translate(0%,80%);">
-        <input type="text" id="editNoteName" name="editNoteName" placeholder="Note name">
-        <button onclick="editNote()">Submit</button>
-        <button onclick="closeEditNoteDialog()">Cancel</button>
-      </div>
-      
-  <!- Insert Search Bar Here -->
+  <!-- Insert Search Bar Here -->
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search notes by name..." onkeyup="searchNotes()">
     <input type="text" id="searchInput" placeholder="Search notes by content... (press enter)" onkeyup="">

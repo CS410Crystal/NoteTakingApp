@@ -3,14 +3,14 @@ mod note;
 mod folder;
 mod dbManager;
 
-use note::{create_note, delete_note, edit_note, get_note_by_name, Note};
-use dbManager::{create_note_in_db, save_new_note_in_db, get_notes_from_dbManager, get_notes_from_db_main_display, db_get_note_by_name, db_get_note_by_id};
+use note::{create_note, delete_note, get_note_by_name, Note};
+use dbManager::{create_note_in_db, save_new_note_in_db, get_notes_from_dbManager, get_notes_from_db_main_display,  db_get_note_by_id};
 use serde_json::Value;
 use std::{fs::{self, File}, sync::Mutex};
 use tauri::State;
 // use tauri::Manager;
 //use note::get_notes_from_db;
-use note::{get_note_by_name_from_db, edit_note_in_db};
+use note::{edit_note_in_db};
 //use dbManager::db_get_notes;
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -240,7 +240,7 @@ pub fn run() {
             edit_note_in_db,
             get_notes_from_dbManager,
             get_notes_from_db_main_display,
-            db_get_note_by_name,
+            // db_get_note_by_name,
             db_get_note_by_id,
             delete_note,
             // create_new_folder,  //  Register the function

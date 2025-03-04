@@ -138,13 +138,12 @@ function editNote() {
   }
   //here we need to createe the note in database (appears we're doing)
   invoke("edit_note_in_db", { name: noteName }).then((response) => {
-    if (response == true) {
+    console.log(response)
       // invoke("save_data_to_db")//save the data in db (appears we're doing)
       //already written to db so no need
       //should return a string
       closeEditNoteDialog();
       location.reload();
-    }
   });
 }
 
@@ -295,6 +294,8 @@ const edit_tab_close = document.getElementById("edit-tab_close")
 edit_tab_close.addEventListener("click", function() {
   edit_container.style.removeProperty("display")
   edit_name.innerText = "Editing Note Name: {}";
+  const status = document.getElementById("edit-tab-save-status");
+  status.style.setProperty("visibility", "hidden");
 })
 
 const edit_save_note = document.getElementById("edit-tab-save")//
@@ -306,7 +307,12 @@ edit_save_note.addEventListener("click", function() {
   const object = JSON.stringify(currently_editing_note)
   invoke("edit_note_in_db", {object}).then((response) => {                      //change this to edit_note_in_db
     // invoke("save_data_to_db").then((save_data_response) => {                    //may need to add response here
-    //   console.log("success")
+      console.log("success")
+      const status = document.getElementById("edit-tab-save-status");
+      if (status.style.getPropertyValue("visibility") == "hidden") {
+        status.style.setProperty("visibility", "visible");
+        
+      }
     //   currently_editing_note_element.innerText = timeAgo(Number(currently_editing_note.last_updated))
     // })
   })

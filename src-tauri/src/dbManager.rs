@@ -185,33 +185,33 @@ pub fn get_notes_from_db_main_display() -> Result<Vec<(String, i64)>, String> {
     Ok(notes)
 }
 
-//get note by name (returns a tuple)
-#[tauri::command]
-pub fn db_get_note_by_name(name: &str) -> Result<(i32, String, String, i64), String> {
-    println!("tried to get note by name");
-    let conn = create_connection().map_err(|e| e.to_string())?;
-    let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE name = ?1").map_err(|e| e.to_string())?;
-    let note_iter = stmt.query_map(params![name], |row| {
-        Ok((
-            row.get(0)?,
-            row.get(1)?,
-            row.get(2)?,
-            row.get(3)?,
-        ))
-    }).map_err(|e| e.to_string())?;
-    let mut notes = Vec::new();
-    for note in note_iter {
-        notes.push(note.map_err(|e| e.to_string())?);
-    }
-    //print the note
-    println!("Got From Manager by Name:\n Note ID: {}, name: {}, content: {}, created_at: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
-    //return the note
-    //print what we're returning:
-    println!("Returning note: {:?}", notes[0]);
+// //get note by name (returns a tuple)
+// #[tauri::command]
+// pub fn db_get_note_by_name(name: &str) -> Result<(i32, String, String, i64), String> {
+//     println!("tried to get note by name");
+//     let conn = create_connection().map_err(|e| e.to_string())?;
+//     let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE name = ?1").map_err(|e| e.to_string())?;
+//     let note_iter = stmt.query_map(params![name], |row| {
+//         Ok((
+//             row.get(0)?,
+//             row.get(1)?,
+//             row.get(2)?,
+//             row.get(3)?,
+//         ))
+//     }).map_err(|e| e.to_string())?;
+//     let mut notes = Vec::new();
+//     for note in note_iter {
+//         notes.push(note.map_err(|e| e.to_string())?);
+//     }
+//     //print the note
+//     println!("Got From Manager by Name:\n Note ID: {}, name: {}, content: {}, created_at: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
+//     //return the note
+//     //print what we're returning:
+//     println!("Returning note: {:?}", notes[0]);
 
-    Ok(notes[0].clone())
+//     Ok(notes[0].clone())
 
-}
+// }
 
 // fn db_get_note_by_id(id: i32) -> Result<(i32, String, String, i64), String> {
     
