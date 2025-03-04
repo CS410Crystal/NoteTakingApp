@@ -273,7 +273,7 @@ function create_note_element(note) {
   // PDF vs text notes might store last_updated differently
   // If it’s stored in seconds, multiply by 1000 if needed
   // For consistency, let's do:
-  lastdate.innerText = timeAgo(note[3]);
+  lastdate.innerText = timeAgo(note[3]*1000);
   note_element.appendChild(lastdate);
 
   // If content is PDF, display PDF; otherwise, open text editor
