@@ -119,6 +119,34 @@ function loadNotes() {
 }
 
 loadNotes();
+
+//open edit note dialog
+function openEditNoteDialog() {
+  document.getElementById("editNoteDialog").style.display = "block";
+}
+
+function closeEditNoteDialog() {
+  document.getElementById("editNoteDialog").style.display = "none";
+}
+
+function editNote() {
+  openEditNoteDialog();
+  console.log("editNote");
+  const noteName = document.getElementById("editNoteName").value;
+  if (noteName == null || noteName == "") {
+    return
+  }
+  //here we need to createe the note in database (appears we're doing)
+  invoke("edit_note_in_db", { name: noteName }).then((response) => {
+    if (response == true) {
+      invoke("save_data_to_db")//save the data in db (appears we're doing)
+      //should return a string
+      closeEditNoteDialog();
+      location.reload();
+    }
+  });
+}
+
 // JJ: NEW CODE END
 //load and display notes on main screen
 

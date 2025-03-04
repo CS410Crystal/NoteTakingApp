@@ -34,7 +34,7 @@ pub fn create_note_in_db(name: &str) -> Result<bool, String> {
     ).map_err(|e| e.to_string())?;
     println!("Ran execute");
     println!("Created note in database: {}", name);
-    save_new_note_in_db(name);
+    // save_new_note_in_db(name);
     Ok(true)
 }
 
@@ -60,13 +60,55 @@ pub fn edit_note_in_db(id: i32, name: &str, content: &str) -> Result<()> {
     //     params![name, content, id],
     // )?;
     // Ok(())
+    println!("Tried to run edit_note_in_db");
     let conn = create_connection().expect("Failed to create database connection");
     conn.execute(
         "UPDATE notes SET name = ?1, content = ?2 WHERE id = ?3",
         params![name, content, id],
     )?;
+
+    //new
+    get_notes_from_db_main_display().expect("Failed to get notes from db_main_display");
+
     Ok(())
 }
+
+//old edit function
+// #[tauri::command]
+// pub fn edit_note(state: State<NotesState>, object: String) -> bool {
+//     let note: Note = serde_json::from_str(&object).unwrap();
+//     //same but for dbNote
+//     let con = dbManager::create_connection().expect("Failed to create database connection");
+//     let dbNote = dbManager::db_get_note_by_name(&con, &note.name).expect("Failed to get note");
+//     //edit note in db
+//     match dbManager::db_edit_note(&con, dbNote.0, &note.name, &note.content) {
+//         Ok(_) => {
+//             println!("Edited note in database file: {}", note.name);
+//         }
+//         Err(e) => {
+//             eprintln!("Failed to edit note: {}", e);
+//             return false
+//         }
+//     }
+//     //continue with original func
+//     let mut notes = state.0.lock().unwrap();
+
+//     let mut note_index: usize = 0;
+//     let mut can_edit: bool = false;
+//     for lock_note in &notes.note_list {
+//         if lock_note.name == note.name {
+//             can_edit = true;
+//             break;
+//         }
+//         note_index += 1;
+//     }
+
+//     if can_edit == true {
+//         notes.note_list[note_index] = note;
+//         return true;
+//     }
+//     return false;
+// }
 
 //delete note
 pub fn delete_note_from_db(conn: &Connection, id: i32) -> Result<()> {
