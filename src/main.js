@@ -97,15 +97,19 @@ function loadNotes() {
     //here we should be getting notes from database
     console.log("invoke get_notes_from_db")
     invoke("get_notes_from_dbManager").then((response) => {
-
-      let notes = JSON.parse(response); //not json
-      notes.sort(compare_last_updated);
-      for (const note of notes) {
+      console.log(response)
+      for (const note of response) {
         let note_element = create_note_element(note);
-        //print the note name
-        console.log("js: "+note.name)
         notes_list.appendChild(note_element);
       }
+      // let notes = JSON.parse(response); //not json
+      // notes.sort(compare_last_updated);
+      // for (const note of notes) {
+      //   let note_element = create_note_element(note);
+      //   //print the note name
+      //   console.log("js: "+note.name)
+      //   notes_list.appendChild(note_element);
+      // }
     })
     invoke("get_folders").then((response) => {
       let folders = JSON.parse(response);
@@ -176,38 +180,48 @@ const edit_name = document.getElementById("edit-name")
 let currently_editing_note;
 let currently_editing_note_element;
 
+/**
+ * 
+ * @param {
+ * 0: id
+ * 1: name
+ * 2: content
+ * 3: last_updated
+ * } note 
+ * @returns object
+ */
 function create_note_element(note) {
   let note_element = document.createElement("div")
-  note_element.setAttribute("name",note.name)
+  note_element.setAttribute("name",note[1])
   note_element.style.width = "200px"
   note_element.style.height = "200px"
   note_element.style.padding = "10px"
   let button = document.createElement("button")
   button.style.width = "200px"
   button.style.height = "200px"
-  button.innerText = note.name;
+  button.innerText = note[1];
   note_element.appendChild(button)
   button.classList.add("note")
   let lastdate = document.createElement("div")
-  lastdate.innerText = timeAgo(note.last_updated)
+  lastdate.innerText = timeAgo(note[3]*1000)
   note_element.appendChild(lastdate)
 
   button.addEventListener("click", function() {                                 //edit note button
     console.log(edit_container.style.display)
     if (edit_container.style.display == "") {
-      invoke("db_get_note_by_name",{name: note.name}).then((response) => {
+      invoke("db_get_note_by_name",{name: note[1]}).then((response) => {
         if (response != "note not found") {
-          let note_response = JSON.parse(response);
+          let note_response = response;
           //get elements of note from database
           
           console.log(note_response)
           edit_container.style.display = "block"
-          edit_name.innerText = "Editing Note Name: " + note_response.name;
+          edit_name.innerText = "Editing Note Name: " + note_response[1];
           currently_editing_note = note_response;
           currently_editing_note_element = lastdate; //temporary
-          edit_note.innerText = note_response.content;
-          edit_note.value = note_response.content;
-          lastdate.innerText = timeAgo(Number(note_response.last_updated))
+          edit_note.innerText = note_response[2];
+          edit_note.value = note_response[2];
+          lastdate.innerText = timeAgo(Number(note_response[3])*1000)
         } else {
           console.error("note not found with name: " + note.name);
         }

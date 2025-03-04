@@ -27,3 +27,4 @@ dist-ssr
 src-tauri/Cargo.lock
 # Save File
 saves.json
+src-tauri/notes.db
