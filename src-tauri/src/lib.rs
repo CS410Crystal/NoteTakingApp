@@ -242,7 +242,7 @@ pub fn run() {
             get_notes_from_db_main_display,
             db_get_note_by_name,
             db_get_note_by_id,
-            // delete_note,
+            delete_note,
             // create_new_folder,  //  Register the function
             //new functions
         ])

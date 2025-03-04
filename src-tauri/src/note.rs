@@ -103,38 +103,42 @@ pub fn edit_note_in_db(state: State<NotesState>, object: String) -> bool {
     return true;
 }
 
+/**
+ * note that state is no longer needed
+ */
 #[tauri::command]
-pub fn delete_note(state: State<NotesState>, name: String) -> bool {
-    let mut notes = state.0.lock().unwrap();
+pub fn delete_note(id: i32) -> bool {
+    // let mut notes = state.0.lock().unwrap();
     //same but for dbNote
     let con = dbManager::create_connection().expect("Failed to create database connection");
-    let dbNote = dbManager::db_get_note_by_name(&name).expect("Failed to get note");
+    let dbNote = dbManager::db_get_note_by_id(id).expect("Failed to get note");
     //delete note in db
     match dbManager::delete_note_from_db(&con, dbNote.0) {
         Ok(_) => {
-            println!("Deleted note from database: {}", name);
+            println!("Deleted note from database: {}", id);
+            return true
         }
         Err(e) => {
             eprintln!("Failed to delete note: {}", e);
             return false
         }
     }
-    //continue with original func
-    let mut note_index: usize = 0;
-    let mut can_edit: bool = false;
-    for lock_note in &notes.note_list {
-        if lock_note.name == name {
-            can_edit = true;
-            break;
-        }
-        note_index += 1;
-    }
+    // //continue with original func (dont for now)
+    // let mut note_index: usize = 0;
+    // let mut can_edit: bool = false;
+    // for lock_note in &notes.note_list {
+    //     if lock_note.last_updated == dbNote.3 as u64 {
+    //         can_edit = true;
+    //         break;
+    //     }
+    //     note_index += 1;
+    // }
 
-    if can_edit == true {
-        notes.note_list.remove(note_index);
-        return true;
-    }
-    return false;
+    // if can_edit == true {
+    //     notes.note_list.remove(note_index);
+    //     return true;
+    // }
+    // return false;
 }
 
 // #[tauri::command]

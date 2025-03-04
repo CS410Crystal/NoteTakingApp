@@ -69,18 +69,16 @@ function createNewNote() {
   }
   //here we need to createe the note in database (appears we're doing)
   invoke("create_note_in_db", { name: noteName }).then((response) => {
-    if (response == true) {
       invoke("save_new_note_in_db")//save the data in db (appears we're doing)
       //should return a string
       closeNewNoteDialog();
 
       // location.reload();
       let note = [
-        0,noteName,"",Date.now()
+        Number(response),noteName,"",Date.now()
       ]
       let note_element = create_note_element(note);
       notes_list.appendChild(note_element);
-    }
   });
 }
 
@@ -141,7 +139,8 @@ function editNote() {
   //here we need to createe the note in database (appears we're doing)
   invoke("edit_note_in_db", { name: noteName }).then((response) => {
     if (response == true) {
-      invoke("save_data_to_db")//save the data in db (appears we're doing)
+      // invoke("save_data_to_db")//save the data in db (appears we're doing)
+      //already written to db so no need
       //should return a string
       closeEditNoteDialog();
       location.reload();
@@ -189,6 +188,7 @@ let currently_editing_note_element;
  * @returns object
  */
 function create_note_element(note) {
+  console.log(note)
   let note_element = document.createElement("div")
   note_element.setAttribute("name",note[1])
   note_element.style.width = "200px"
@@ -300,8 +300,8 @@ edit_tab_close.addEventListener("click", function() {
 const edit_save_note = document.getElementById("edit-tab-save")//
 edit_save_note.addEventListener("click", function() {
   if (currently_editing_note != null) {
-    currently_editing_note.content = edit_note.value;
-    currently_editing_note.last_updated = Date.now();
+    currently_editing_note[2] = edit_note.value;
+    currently_editing_note[3] = Date.now();
   }
   const object = JSON.stringify(currently_editing_note)
   invoke("edit_note_in_db", {object}).then((response) => {                      //change this to edit_note_in_db
@@ -317,14 +317,15 @@ delete_note.addEventListener("click",function() {
 if (currently_editing_note == "" || currently_editing_note == null || currently_editing_note == undefined) {
   return
 }
-  invoke("delete_note", {name: currently_editing_note.name}).then((response) => {
+  invoke("delete_note", {id: currently_editing_note[0]}).then((response) => {
+    console.log(response)
     if (response == true) {
-      invoke("save_data_to_db").then((save_data_response) => {                  //may need to add response here
+      // invoke("save_data_to_db").then((save_data_response) => {                  //may need to add response here
         edit_container.style.removeProperty("display")
         edit_name.innerText = "Editing Note Name: {}";
-        currently_editing_note_element.parentElement.parentElement.remove();
+        currently_editing_note_element.parentElement.remove();
         currently_editing_note_element = null;
-      })
+      // })
     }
   });
 });

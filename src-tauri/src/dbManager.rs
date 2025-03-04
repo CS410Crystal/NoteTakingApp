@@ -20,7 +20,7 @@ pub fn create_connection() -> Result<Connection> {
 }
 //create note                                                                   //this is working
 #[tauri::command]
-pub fn create_note_in_db(name: &str) -> Result<bool, String> {
+pub fn create_note_in_db(name: &str) -> Result<i32, String> {
     //get the largest id in the database
     println!("name: {}", name);
     println!("Tried to run create_note_in_db");
@@ -34,14 +34,14 @@ pub fn create_note_in_db(name: &str) -> Result<bool, String> {
     //print the connection
     println!("{:?}", conn);
     //get the highest id in the database
-    let _new_id: i32 = id + 1;
+    let new_id: i32 = id + 1;
     conn.execute(
-        "INSERT INTO notes (_new_id, name, content, created_at) VALUES (?1, ?2, ?3, ?4)",
+        "INSERT INTO notes (name, content, created_at) VALUES (?1, ?2, ?3)",
         params![name, "content", chrono::Utc::now().timestamp()],
     ).map_err(|e| e.to_string())?;
     println!("Ran execute");
     println!("Created note in database: {}", name);
-    Ok(true)
+    Ok(new_id)
 }
 
 pub fn get_largest_id(conn: &Connection) -> Result<i32> {
