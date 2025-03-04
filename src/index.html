@@ -6,6 +6,11 @@
   <link rel="stylesheet" href="styles.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tauri App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js";
+</script>
   <script type="text/javascript" src="main.js" defer></script>
 </head>
 
@@ -35,7 +40,7 @@
 
   <div id="theSidenav" class="sidenav">
     <a href="#" class="closebtn" onclick="closeNav()"> <img src="assets/close.svg" alt="close" title="Close"></a>
-    <a href="#">Import</a>
+    <a href="#" onclick="importFile()">Import</a>
     <a href="#">Export</a>
     <label for="alphabetSort"> Sort Alphabetically</label>
     <input type="checkbox" id="alphabetSort" onclick="alphabetSort()"/>
@@ -76,6 +81,14 @@
       <button id="edit-tab-save">Save Note</button><span id="edit-tab-save-status" style="color:black; visibility: hidden;">Saved!</span>
       <textarea id="edit_note" style="height: 90%; width: 100%;"></textarea>
       <button id="delete_note">Delete Note</button>
+    </div>
+  </div>
+  <div id="pdfViewerModal" class="pdfViewerModal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+    <div style="position:relative; margin:auto; width:80%; height:80%; background:white;">
+      <span onclick="closePDFViewer()"
+        style="position:absolute; top:10px; right:20px; cursor:pointer; font-size:24px;">&times;</span>
+      <canvas id="pdfCanvas" style="width:100%; height:100%;"></canvas>
     </div>
   </div>
 

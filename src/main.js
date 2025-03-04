@@ -426,3 +426,140 @@ function showNotes() {
   });
 
 }
+
+function importFile() {
+  const input = document.createElement("input");
+  // Now accepts PDFs in addition to text-based files
+  input.accept = ".txt,.md,.doc,.docx,.pdf";
+  input.type = "file";
+  input.onchange = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const fileName = file.name.split('.').slice(0, -1).join('.');
+    if (file.name.toLowerCase().endsWith(".pdf")) {
+      // Read PDF file as data URL
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        // Call new Tauri command "pdf_import" to save the PDF note
+        invoke("pdf_import", { name: fileName, content: dataUrl }).then((response) => {
+          if (response) {
+            // Add a new note element that will open the PDF viewer when clicked
+            let importedNote = [Date.now(), fileName, dataUrl, Date.now()];
+            let note_element = create_note_element(importedNote);
+            notes_list.appendChild(note_element);
+            alert("PDF imported successfully as a note!");
+          } else {
+            alert("A note with this name already exists!");
+          }
+        }).catch((error) => {
+          console.error("Error importing PDF:", error);
+          alert("Failed to import PDF file.");
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // Existing handling for text-based files
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fileContent = e.target.result;
+        let importedNote = {
+          name: fileName,
+          content: fileContent,
+          last_updated: Date.now()
+        };
+        invoke("text_import", { name: importedNote.name, content: importedNote.content }).then((response) => {
+          if (response) {
+            invoke("save_data");
+            let note_element = create_note_element(importedNote);
+            notes_list.appendChild(note_element);
+            alert("File imported successfully as a note!");
+          } else {
+            alert("A note with this name already exists!");
+          }
+        }).catch((error) => {
+          console.error("Error importing file:", error);
+          alert("Failed to import file.");
+        });
+      };
+      reader.readAsText(file);
+    }
+  };
+  input.click();
+}
+
+// Update note creation so PDF notes are handled differently
+function create_note_element(note) {
+  // note: [id, name, content, last_updated]
+  let note_element = document.createElement("div");
+  note_element.setAttribute("name", note[1]);
+  note_element.style.width = "200px";
+  note_element.style.height = "200px";
+  note_element.style.padding = "10px";
+  
+  let button = document.createElement("button");
+  button.style.width = "200px";
+  button.style.height = "200px";
+  button.innerText = note[1];
+  note_element.appendChild(button);
+  button.classList.add("note");
+  
+  let lastdate = document.createElement("div");
+  lastdate.innerText = timeAgo(note[3]);
+  note_element.appendChild(lastdate);
+
+  // Check if the note's content is a PDF (data URL will start with "data:application/pdf")
+  if (typeof note[2] === "string" && note[2].startsWith("data:application/pdf")) {
+    button.addEventListener("click", function() {
+      displayPDFData(note[2]);
+    });
+  } else {
+    button.addEventListener("click", function() {
+      invoke("db_get_note_by_id", { id: note[0] }).then((response) => {
+        if (response != "note not found") {
+          let note_response = response;
+          // existing text note editing behavior…
+          edit_container.style.display = "block";
+          edit_name.innerText = "Editing Note Name: " + note_response[1];
+          currently_editing_note = note_response;
+          currently_editing_note_element = lastdate;
+          edit_note.innerText = note_response[2];
+          edit_note.value = note_response[2];
+          lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
+        } else {
+          console.error("note not found with name: " + note[1]);
+        }
+      });
+    });
+  }
+  return note_element;
+}
+
+// Function to display a PDF note using PDF.js
+function displayPDFData(dataUrl) {
+  document.getElementById("pdfViewerModal").style.display = "block";
+  const loadingTask = pdfjsLib.getDocument(dataUrl);
+  loadingTask.promise.then(function(pdf) {
+    // For this example, display the first page
+    pdf.getPage(1).then(function(page) {
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale: scale });
+      const canvas = document.getElementById("pdfCanvas");
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+      page.render(renderContext);
+    });
+  }, function (reason) {
+    console.error(reason);
+  });
+}
+
+function closePDFViewer() {
+  document.getElementById("pdfViewerModal").style.display = "none";
+}

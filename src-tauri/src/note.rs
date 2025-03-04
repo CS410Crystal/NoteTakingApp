@@ -169,6 +169,87 @@ pub fn get_note_by_name(state: State<NotesState>, name: String) -> String {
     return "note not found".to_string();
 }
 
+#[tauri::command]
+pub fn text_import(state: State<NotesState>, name: String, content: String) -> bool {
+    // Prevent duplicates in memory
+    let mut notes = state.0.lock().unwrap();
+    for lock_note in &notes.note_list {
+        if lock_note.name == name {
+            return false;
+        }
+    }
+
+    // Create or open the DB connection
+    let conn = match dbManager::create_connection() {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("DB connection failed: {}", e);
+            return false;
+        }
+    };
+
+    // Insert a new row, get back the new ID
+    let new_id = match dbManager::create_note_in_db(&name) {
+        Ok(id) => id,
+        Err(e) => {
+            eprintln!("Failed to insert note: {}", e);
+            return false;
+        }
+    };
+
+    // Now update the note’s content
+    if let Err(e) = dbManager::edit_note_in_db(new_id, &name, &content) {
+        eprintln!("Failed to update note content: {}", e);
+        return false;
+    }
+
+    // Also track it in-memory
+    let mut note = Note::new();
+    note.name = name;
+    note.content = content;
+    notes.note_list.push(note);
+
+    true
+}
+
+#[tauri::command]
+pub fn pdf_import(state: State<NotesState>, name: String, content: String) -> bool {
+    let mut notes = state.0.lock().unwrap();
+    // Prevent duplicates in memory
+    for lock_note in &notes.note_list {
+        if lock_note.name == name {
+            return false;
+        }
+    }
+
+    // Insert a new row
+    let conn = dbManager::create_connection().expect("DB connection failed");
+    let new_id = match dbManager::create_note_in_db(&name) {
+        Ok(id) => id,
+        Err(e) => {
+            eprintln!("Failed to insert PDF note: {}", e);
+            return false;
+        }
+    };
+
+    // Update the content column to the PDF data
+    if let Err(e) = dbManager::edit_note_in_db(new_id, &name, &content) {
+        eprintln!("Failed to store PDF content: {}", e);
+        return false;
+    }
+
+    // Also keep a copy in memory
+    let mut note = Note::new();
+    note.name = name;
+    note.content = content;
+    notes.note_list.push(note);
+
+    //println!("Imported PDF as note: {}", name);
+    true
+}
+
+
+
 // #[tauri::command]
 // pub fn get_note_by_name_from_db(state: State<NotesState>, name: String) -> String {
 //     let con = dbManager::create_connection().expect("Failed to create database connection");
