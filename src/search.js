@@ -33,6 +33,7 @@ function searchNotes() {
   }
 
   function handleContentSearch(event) {
+    console.log(event)
     if (event.key === 'Enter') {
         const searchTerm = document.getElementById('contentSearchInput').value;
         if (searchTerm.trim() === '') {

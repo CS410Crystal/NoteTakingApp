@@ -4,7 +4,7 @@ mod folder;
 mod dbManager;
 
 use note::{create_note, delete_note, get_note_by_name, text_import, pdf_import, docx_import,  Note};
-use dbManager::{create_note_in_db, save_new_note_in_db, get_notes_from_dbManager, get_notes_from_db_main_display,  db_get_note_by_id};
+use dbManager::{create_note_in_db, db_get_note_by_id, get_notes_from_dbManager, get_notes_from_db_main_display, save_new_note_in_db, search_notes_by_content};
 use serde_json::Value;
 use std::{fs::{self, File}, sync::Mutex};
 use tauri::State;
@@ -245,7 +245,8 @@ pub fn run() {
             delete_note,
             text_import,
             pdf_import,
-            docx_import
+            docx_import,
+            search_notes_by_content
             // create_new_folder,  //  Register the function
             //new functions
         ])
