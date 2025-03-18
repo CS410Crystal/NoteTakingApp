@@ -376,23 +376,17 @@ function showFolders() {
 function showNotes() {
   console.log("showNotes");
   notes_list.innerHTML = "";
-  invoke("get_notes_from_db_main_display").then((response) => {
+  invoke("get_notes_from_dbManager").then((response) => {
     // This returns an array of [name, last_updated], so handle accordingly:
     // e.g. let notes = response.map( ... ) or adapt as needed
     console.log(response);
-    response.sort((a, b) => b[1] - a[1]); // Sort by last_updated desc
+    response.sort((a, b) => b[3] - a[3]); // Sort by last_updated desc
     for (const note of response) {
       // If you need [id, name, content, last_updated], you'll need a different call
       // For demonstration, just create a placeholder with name
       // and note[1] as "last_updated"
-      let placeholder = [
-        Date.now(), // dummy ID
-        note[0],    // name
-        "",         // content
-        note[1]     // last_updated
-      ];
-      let note_element = create_note_element(placeholder);
-      notes_list.appendChild(note_element);
+      let note_element = create_note_element(note);
+            notes_list.appendChild(note_element);
     }
   });
 }

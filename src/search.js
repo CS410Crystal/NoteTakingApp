@@ -31,3 +31,35 @@ function searchNotes() {
     const element = document.getElementById('notes_list');
     element.innerHTML = '';
   }
+
+  function handleContentSearch(event) {
+    if (event.key === 'Enter') {
+        const searchTerm = document.getElementById('contentSearchInput').value;
+        if (searchTerm.trim() === '') {
+            showNotes(); // Show all notes if empty search
+            return;
+        }
+        searchByContent(searchTerm);
+    }
+}
+
+function searchByContent(searchTerm) {
+    invoke('search_notes_by_content', { searchTerm })
+        .then(response => {
+            notes_list.innerHTML = "";
+            for (const note of response) {
+                // Create proper note structure from full note data
+                let note_element = create_note_element([
+                    note[0],    // id
+                    note[1],    // name
+                    note[2],    // content
+                    note[3]     // created_at
+                ]);
+                notes_list.appendChild(note_element);
+            }
+        })
+        .catch(error => {
+            console.error('Search failed:', error);
+            alert('Search failed: ' + error);
+        });
+}

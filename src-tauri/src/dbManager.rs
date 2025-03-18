@@ -289,3 +289,28 @@ pub fn to_string(conn: &Connection) -> String {
     }
     notes_string
 }
+
+#[tauri::command]
+pub fn search_notes_by_content(search_term: String) -> Result<Vec<(i32, String, String, i64)>, String> {
+    let conn = create_connection().map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare(
+        "SELECT id, name, content, created_at FROM notes 
+        WHERE content LIKE ?1 COLLATE NOCASE"
+    ).map_err(|e| e.to_string())?;
+    
+    let search_pattern = format!("%{}%", search_term);
+    let note_iter = stmt.query_map(params![search_pattern], |row| {
+        Ok((
+            row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+            row.get(3)?,
+        ))
+    }).map_err(|e| e.to_string())?;
+    
+    let mut notes = Vec::new();
+    for note in note_iter {
+        notes.push(note.map_err(|e| e.to_string())?);
+    }
+    Ok(notes)
+}
