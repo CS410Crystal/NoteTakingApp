@@ -206,6 +206,82 @@ button:active {
   margin: 0;
 }
 
+.newNoteToFolderDialog {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(22,22,22,0.5);
+  display: none;
+}
+
+.newNoteToFolderDialog-content {
+  width: 30%;
+  min-width: 300px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: darkgray;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  /* animation-name: animatefade; */
+  animation-duration: 0.4s
+}
+
+.newNoteToFolderDialog-content h2 {
+  margin-bottom: 20px;
+}
+
+.newNoteToFolderDialog-content input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.newNoteToFolderDialog-content button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0e0041;
+  color: #fff;
+  cursor: pointer;
+}
+
+.newNoteToFolderDialog-content button:hover {
+  background-color: darkgreen;
+}
+
+.newNoteToFolderDialog-content button:active {
+  background-color: darkolivegreen;
+}
+
+.newNoteToFolderDialog-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+  color: darkblue;
+}
+
+.existingFoldersDisplay {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display:none
+}
+
+
 
 /* FOR NEW NOTE WINDOW */
 .newNoteDialog {

@@ -20,6 +20,14 @@ function openNewFolderDialog() {
 function closeNewFolderDialog() {
   document.getElementById("newFolderDialog").style.display = "none";
 }
+
+function displayExistingFolders() {
+  document.getElementById("existingFoldersDisplay").style.display = "block";
+}
+
+function closeExistingFoldersDisplay() {
+  document.getElementById("existingFoldersDisplay").style.display = "none";
+}
 // THOUGHTS?
 function createNewFolder() {
   const folderName = document.getElementById("newFolderName").value;
@@ -56,6 +64,14 @@ function openNewNoteDialog() {
 function closeNewNoteDialog() {
   document.getElementById("newNoteDialog").style.display = "none";
 }
+
+function openNewNoteToFolderDialog() {
+  document.getElementById("newNoteToFolderDialog").style.display = "block";
+}
+
+function closeNewNoteToFolderDialog() {
+  document.getElementById("newNoteToFolderDialog").style.display = "none";
+}
 /**
  * Creates new note based on name
  * fails if note name is empty or name already exists (case sensitive)
@@ -74,6 +90,7 @@ function createNewNote() {
       // working here 3/23
       // addToFolderDialog(noteName, response);
       closeNewNoteDialog();
+      openNewNoteToFolderDialog();
 
     // Append new note element
     let note = [Number(response), noteName, "", Date.now()];
