@@ -71,6 +71,8 @@ function createNewNote() {
   invoke("create_note_in_db", { name: noteName }).then((response) => {
       invoke("save_new_note_in_db")//save the data in db (appears we're doing)
       //should return a string
+      // working here 3/23
+      // addToFolderDialog(noteName, response);
       closeNewNoteDialog();
 
     // Append new note element
@@ -79,6 +81,8 @@ function createNewNote() {
     notes_list.appendChild(note_element);
   });
 }
+
+
 
 const notes_list = document.getElementById("notes_list");//where is notes_list defined?
 //Load Notes
