@@ -92,42 +92,6 @@ pub fn edit_note_in_db(id: i32, name: &str, content: &str) -> Result<()> {
     Ok(())
 }
 
-//old edit function
-// #[tauri::command]
-// pub fn edit_note(state: State<NotesState>, object: String) -> bool {
-//     let note: Note = serde_json::from_str(&object).unwrap();
-//     //same but for dbNote
-//     let con = dbManager::create_connection().expect("Failed to create database connection");
-//     let dbNote = dbManager::db_get_note_by_name(&con, &note.name).expect("Failed to get note");
-//     //edit note in db
-//     match dbManager::db_edit_note(&con, dbNote.0, &note.name, &note.content) {
-//         Ok(_) => {
-//             println!("Edited note in database file: {}", note.name);
-//         }
-//         Err(e) => {
-//             eprintln!("Failed to edit note: {}", e);
-//             return false
-//         }
-//     }
-//     //continue with original func
-//     let mut notes = state.0.lock().unwrap();
-
-//     let mut note_index: usize = 0;
-//     let mut can_edit: bool = false;
-//     for lock_note in &notes.note_list {
-//         if lock_note.name == note.name {
-//             can_edit = true;
-//             break;
-//         }
-//         note_index += 1;
-//     }
-
-//     if can_edit == true {
-//         notes.note_list[note_index] = note;
-//         return true;
-//     }
-//     return false;
-// }
 
 //delete note
 pub fn delete_note_from_db(conn: &Connection, id: i32) -> Result<()> {
@@ -185,38 +149,6 @@ pub fn get_notes_from_db_main_display() -> Result<Vec<(String, i64)>, String> {
     Ok(notes)
 }
 
-// //get note by name (returns a tuple)
-// #[tauri::command]
-// pub fn db_get_note_by_name(name: &str) -> Result<(i32, String, String, i64), String> {
-//     println!("tried to get note by name");
-//     let conn = create_connection().map_err(|e| e.to_string())?;
-//     let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE name = ?1").map_err(|e| e.to_string())?;
-//     let note_iter = stmt.query_map(params![name], |row| {
-//         Ok((
-//             row.get(0)?,
-//             row.get(1)?,
-//             row.get(2)?,
-//             row.get(3)?,
-//         ))
-//     }).map_err(|e| e.to_string())?;
-//     let mut notes = Vec::new();
-//     for note in note_iter {
-//         notes.push(note.map_err(|e| e.to_string())?);
-//     }
-//     //print the note
-//     println!("Got From Manager by Name:\n Note ID: {}, name: {}, content: {}, created_at: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
-//     //return the note
-//     //print what we're returning:
-//     println!("Returning note: {:?}", notes[0]);
-
-//     Ok(notes[0].clone())
-
-// }
-
-// fn db_get_note_by_id(id: i32) -> Result<(i32, String, String, i64), String> {
-    
-// }
-
 //get note by last_updated (returns a tuple)
 pub fn db_get_note_by_last_updated(conn: &Connection, last_updated: i64) -> Result<(i32, String, String, i64)> {
     let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE created_at = ?1")?;
@@ -234,23 +166,7 @@ pub fn db_get_note_by_last_updated(conn: &Connection, last_updated: i64) -> Resu
     }
     Ok(notes[0].clone())
 }
-//get note by id
-// pub fn db_get_note_by_id(conn: &Connection, id: i32) -> Result<(i32, String, String, i64)> {
-//     let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE id = ?1")?;
-//     let note_iter = stmt.query_map(params![id], |row| {
-//         Ok((
-//             row.get(0)?,
-//             row.get(1)?,
-//             row.get(2)?,
-//             row.get(3)?,
-//         ))
-//     })?;
-//     let mut notes = Vec::new();
-//     for note in note_iter {
-//         notes.push(note?);
-//     }
-//     Ok(notes[0].clone())
-// }
+
 
 #[tauri::command]
 pub fn db_get_note_by_id(id: i32) -> Result<(i32, String, String, i64), String> {
