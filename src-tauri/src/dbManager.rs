@@ -16,6 +16,17 @@ pub fn create_connection() -> Result<Connection> {
         )",
         [],
     )?;
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS folders (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            created_at INTEGER NOT NULL,
+            last_updated INTEGER NOT NULL,
+            size INTEGER NOT NULL,
+            num_notes INTEGER NOT NULL
+        )",
+        [],
+    )?;
     Ok(conn)
 }
 //create note                                                                   //this is working
