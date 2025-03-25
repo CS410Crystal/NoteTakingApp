@@ -85,12 +85,12 @@ function createNewNote() {
   }
   //here we need to createe the note in database (appears we're doing)
   invoke("create_note_in_db", { name: noteName }).then((response) => {
-      invoke("save_new_note_in_db")//save the data in db (appears we're doing)
-      //should return a string
-      // working here 3/23
-      // addToFolderDialog(noteName, response);
-      closeNewNoteDialog();
-      openNewNoteToFolderDialog();
+    invoke("save_new_note_in_db")//save the data in db (appears we're doing)
+    //should return a string
+    // working here 3/23
+    // addToFolderDialog(noteName, response);
+    closeNewNoteDialog();
+    openNewNoteToFolderDialog();
 
     // Append new note element
     let note = [Number(response), noteName, "", Date.now()];
@@ -131,7 +131,7 @@ function loadNotes() {
         notes_list.appendChild(folder_element);
       }
     });
-    
+
   })
 }
 
@@ -156,11 +156,11 @@ function editNote() {
   //here we need to createe the note in database (appears we're doing)
   invoke("edit_note_in_db", { name: noteName }).then((response) => {
     console.log(response)
-      // invoke("save_data_to_db")//save the data in db (appears we're doing)
-      //already written to db so no need
-      //should return a string
-      closeEditNoteDialog();
-      location.reload();
+    // invoke("save_data_to_db")//save the data in db (appears we're doing)
+    //already written to db so no need
+    //should return a string
+    closeEditNoteDialog();
+    location.reload();
   });
 }
 
@@ -176,7 +176,7 @@ function editNote() {
  * @param {*} b Note Object
  * @returns priority number (greater means newer)
  */
-function compare_last_updated(a,b) {
+function compare_last_updated(a, b) {
   if (a.last_updated < b.last_updated) {
     return 1;
   }
@@ -188,11 +188,11 @@ function compare_last_updated(a,b) {
 
 function scaleHeight() {
   const windowHeight = window.innerHeight;
-  const desiredHeight = windowHeight*.85
+  const desiredHeight = windowHeight * .85
   notes_list.style.height = desiredHeight + "px"
   console.log("test")
 }
-window.addEventListener("resize",scaleHeight)
+window.addEventListener("resize", scaleHeight)
 
 function timeAgo(date) {
   const now = new Date();
@@ -294,17 +294,17 @@ function create_note_element(note) {
   // PDF vs text notes might store last_updated differently
   // If it’s stored in seconds, multiply by 1000 if needed
   // For consistency, let's do:
-  lastdate.innerText = timeAgo(note[3]*1000);
+  lastdate.innerText = timeAgo(note[3] * 1000);
   note_element.appendChild(lastdate);
 
   // If content is PDF, display PDF; otherwise, open text editor
   if (typeof note[2] === "string" && note[2].startsWith("data:application/pdf")) {
-    button.addEventListener("click", function() {
+    button.addEventListener("click", function () {
       displayPDFData(note); // pass entire note so we can also delete it
     });
   } else {
     // normal text note
-    button.addEventListener("click", function() {
+    button.addEventListener("click", function () {
       invoke("db_get_note_by_id", { id: note[0] }).then((response) => {
         if (response !== "note not found") {
           let note_response = response;
@@ -348,26 +348,34 @@ function create_folder_element(folder) {
 }
 
 // Sorting / Searching
+let lastArray = undefined;
 function alphabetSort() {
   let checkBox = document.getElementById("alphabetSort");
   let notes = document.querySelectorAll(".note");
-  
-  if (checkBox.checked === true){
-    notes.forEach(note => {
-      note.parentElement.style.display = "none";
-    });
+  console.log(checkBox.checked)
+  if (checkBox.checked === true) {
+    const elements = Array.from(notes)
+    lastArray = elements.slice()
+    elements.sort((a, b) => a.textContent.localeCompare(b.textContent))
+    const parent = notes_list;
+    elements.forEach(element => parent.appendChild(element.parentNode))
+
   } else {
-    notes.forEach(note => {
-      note.parentElement.style.display = "block";
-    });
+    const elements = lastArray
+    console.log(elements)
+    if (elements == undefined) {
+      return
+    }
+    const parent = notes_list;
+    elements.forEach(element => parent.appendChild(element.parentNode))
   }
 }
 
 function dateSort() {
   let checkBox = document.getElementById("dateSort");
   let notes = document.querySelectorAll(".note");
-  
-  if (checkBox.checked === true){
+
+  if (checkBox.checked === true) {
     notes.forEach(note => {
       note.parentElement.style.display = "none";
     });
@@ -407,7 +415,7 @@ function showNotes() {
       // For demonstration, just create a placeholder with name
       // and note[1] as "last_updated"
       let note_element = create_note_element(note);
-            notes_list.appendChild(note_element);
+      notes_list.appendChild(note_element);
     }
   });
 }
@@ -415,7 +423,7 @@ function showNotes() {
 function searchNotes() {
   let input = document.getElementById("searchInput").value.toLowerCase();
   let notes = document.querySelectorAll(".note");
-  
+
   notes.forEach(note => {
     let noteName = note.textContent.toLowerCase();
     if (noteName.includes(input)) {
@@ -432,7 +440,7 @@ function importFile() {
   input.accept = ".txt,.md,.doc,.docx,.pdf";
   input.type = "file";
 
-  input.onchange = function(event) {
+  input.onchange = function (event) {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -441,7 +449,7 @@ function importFile() {
     if (file.name.toLowerCase().endsWith(".pdf")) {
       // PDF Path:
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const dataUrl = e.target.result;
         invoke("pdf_import", { name: fileName, content: dataUrl })
           .then((response) => {
@@ -463,7 +471,7 @@ function importFile() {
     } else if (file.name.toLowerCase().endsWith(".docx")) {
       // DOCX Path:
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const arrayBuffer = e.target.result;
         const bytes = new Uint8Array(arrayBuffer);
         let binary = "";
@@ -494,7 +502,7 @@ function importFile() {
     } else {
       // text-based path (.txt, .md, .doc)
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const fileContent = e.target.result;
         let importedNote = {
           name: fileName,
@@ -590,10 +598,10 @@ function closePDFViewer() {
 }
 
 // Hook up the PDF delete button
-document.getElementById("deletePdfButton").addEventListener("click", function() {
+document.getElementById("deletePdfButton").addEventListener("click", function () {
   if (!currently_viewing_pdf_note) return;
   const noteId = currently_viewing_pdf_note[0];
-  
+
   invoke("delete_note", { id: noteId }).then((response) => {
     if (response === true) {
       // remove the note tile from the DOM
