@@ -146,29 +146,6 @@ function closeEditNoteDialog() {
   document.getElementById("editNoteDialog").style.display = "none";
 }
 
-function editNote() {
-  openEditNoteDialog();
-  console.log("editNote");
-  const noteName = document.getElementById("editNoteName").value;
-  if (noteName == null || noteName == "") {
-    return
-  }
-  //here we need to createe the note in database (appears we're doing)
-  invoke("edit_note_in_db", { name: noteName }).then((response) => {
-    console.log(response)
-    // invoke("save_data_to_db")//save the data in db (appears we're doing)
-    //already written to db so no need
-    //should return a string
-    closeEditNoteDialog();
-    location.reload();
-  });
-}
-
-// JJ: NEW CODE END
-//load and display notes on main screen
-
-
-
 /**
  * Compare notes by last updated
  * Prefers to show newer notes first
@@ -238,15 +215,23 @@ edit_tab_close.addEventListener("click", function () {
   status.style.setProperty("color", "black");
 });
 
+const input_edit_name = document.getElementById("input-edit-name")
 const edit_save_note = document.getElementById("edit-tab-save");
+
+let note_element_editing = undefined
+
 edit_save_note.addEventListener("click", function () {
   if (currently_editing_note != null) {
+    currently_editing_note[1] = input_edit_name.value;
     currently_editing_note[2] = edit_note.value;
     currently_editing_note[3] = Date.now();
   }
   const object = JSON.stringify(currently_editing_note);
   invoke("edit_note_in_db", { object }).then((response) => {
     console.log("success");
+    if (note_element_editing != null) {
+      note_element_editing.textContent = input_edit_name.value;
+    }
     const status = document.getElementById("edit-tab-save-status");
     if (status.style.getPropertyValue("visibility") === "hidden") {
       status.style.setProperty("visibility", "visible");
@@ -312,8 +297,12 @@ function create_note_element(note) {
           edit_name.innerText = "Editing Note Name: " + note_response[1];
           currently_editing_note = note_response;
           currently_editing_note_element = lastdate;
+          input_edit_name.value = note_response[1];
           edit_note.innerText = note_response[2];
           edit_note.value = note_response[2];
+
+          note_element_editing = button;
+
           lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
         } else {
           console.error("Note not found with name: " + note[1]);
