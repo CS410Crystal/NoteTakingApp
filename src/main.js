@@ -75,8 +75,6 @@ function addToFolder() {                                                  //data
     location.reload();
   });
 }
-  //need to add a placeholder for the current note, maybe in dbmanager
-
 
 
 function openNewNoteDialog() {
@@ -110,7 +108,7 @@ function createNewNote() {
   invoke("create_note_in_db", { name: noteName }).then((response) => {
     invoke("save_new_note_in_db")//save the data in db (appears we're doing)
     //should return a string
-    // working here 3/23
+
     // addToFolderDialog(noteName, response);
     closeNewNoteDialog();
     openNewNoteToFolderDialog();
@@ -121,7 +119,6 @@ function createNewNote() {
     notes_list.appendChild(note_element);
 
     closeNewNoteDialog();
-    // let data = response;
     openNewNoteToFolderDialog(); //data
   });
 }

@@ -24,10 +24,10 @@ pub fn create_connection() -> Result<Connection> {
             created_at INTEGER NOT NULL,
             last_updated INTEGER NOT NULL,
             size INTEGER NOT NULL,
-            num_notes INTEGER NOT NULL,
-            FOREIGN KEY (id) REFERENCES notes (id)
+            num_notes INTEGER NOT NULL
         )",
         [],
+        //did have FOREIGN KEY (id) REFERENCES notes(id) at the end
     )?;
     Ok(conn)
 }
@@ -54,9 +54,7 @@ pub fn create_note_in_db(name: &str) -> Result<i32, String> {
 //new
 #[tauri::command]
 pub fn create_folder_in_db (name: &str) -> Result<i32, String> {
-    //get the largest id in the database
-    println!("name: {}", name);
-    println!("Tried to run create_folder_in_db");
+
     let conn = create_connection().map_err(|e| e.to_string())?;
     //get the largest id in the database
     let id = get_largest_id(&conn).map_err(|e| e.to_string())?;
@@ -66,37 +64,19 @@ pub fn create_folder_in_db (name: &str) -> Result<i32, String> {
         "INSERT INTO folders (name, created_at, last_updated, size, num_notes) VALUES (?1, ?2, ?3, ?4, ?5)",
         params![name, chrono::Utc::now().timestamp(), chrono::Utc::now().timestamp(), 0, 0],
     ).map_err(|e| e.to_string())?;
-    println!("Ran execute");
-    println!("Created folder in database: {}", name);
+
     Ok(new_id)
 }
 
 #[tauri::command]
-pub fn save_folder_in_db(name: &str, id: i32) -> Result<(), String> {
-    let conn = create_connection().map_err(|e| e.to_string())?;
-    conn.execute(
-        "UPDATE folders SET name = ?1 WHERE id = ?2",
-        params![name, id],
-    ).map_err(|e| e.to_string())?;
-    Ok(())
-}
-
-// #[tauri::command]
-// pub fn add_note_to_folder_in_db(folder_id: i32) -> Result<(), String> {
-//     let conn = create_connection().map_err(|e| e.to_string())?;
-//     conn.execute(
-//         "UPDATE folders SET num_notes = num_notes + 1 WHERE id = ?1",
-//         params![folder_id],
-//     ).map_err(|e| e.to_string())?;
-//     Ok(())
-// }
-
-#[tauri::command]
 pub fn add_note_to_folder_in_db(folder_id: i32, note_id: i32) -> Result<(), String> {
-    //if the note isn't already in the folder, add it
     let conn = create_connection().map_err(|e| e.to_string())?;
     conn.execute(
-        "INSERT INTO folder_notes (folder_id, note_id) VALUES (?1, ?2)",
+        "UPDATE folders SET num_notes = num_notes + 1 WHERE id = ?1",
+        params![folder_id],
+    ).map_err(|e| e.to_string())?;
+    conn.execute(
+        "UPDATE notes SET folder_id = ?1 WHERE id = ?2",
         params![folder_id, note_id],
     ).map_err(|e| e.to_string())?;
     Ok(())
@@ -114,30 +94,12 @@ pub fn get_largest_id(conn: &Connection) -> Result<i32> {
     Ok(id)
 }
 
-//don't think we need this -jj
-//save a new note to the database
-#[tauri::command]
-pub fn save_new_note_in_db(name: &str) -> Result<(), String> {
-    println!("Tried to run save_new_note_in_db");
-    let conn = create_connection().map_err(|e| e.to_string())?;
-    conn.execute(
-        "INSERT INTO notes (name, created_at) VALUES (?1, ?3)",
-        params![name, chrono::Utc::now().timestamp()],
-    ).map_err(|e| e.to_string())?;
 
-    println!("Saved new note in database: {}", name);
-    Ok(())
-}
 
 
 //edit note
 pub fn edit_note_in_db(id: i32, name: &str, content: &str) -> Result<()> {
-    // conn.execute(
-    //     "UPDATE notes SET name = ?1, content = ?2 WHERE id = ?3",
-    //     params![name, content, id],
-    // )?;
-    // Ok(())
-    println!("Tried to run edit_note_in_db");
+
     let conn = create_connection().expect("Failed to create database connection");
     conn.execute(
         "UPDATE notes SET name = ?1, content = ?2 WHERE id = ?3",
