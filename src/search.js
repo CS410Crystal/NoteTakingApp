@@ -54,7 +54,7 @@ function searchByContent(searchTerm) {
                     note[0],    // id
                     note[1],    // name
                     note[2],    // content
-                    note[3]     // created_at
+                    note[3]     // last_updated
                 ]);
                 notes_list.appendChild(note_element);
             }

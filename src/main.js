@@ -231,6 +231,8 @@ edit_save_note.addEventListener("click", function () {
     console.log("success");
     if (note_element_editing != null) {
       note_element_editing.textContent = input_edit_name.value;
+      console.log(response)
+      note_element_editing.parentElement.getElementsByClassName('lastdate')[0].textContent = timeAgo(response * 1000);
     }
     const status = document.getElementById("edit-tab-save-status");
     if (status.style.getPropertyValue("visibility") === "hidden") {
@@ -276,6 +278,7 @@ function create_note_element(note) {
   button.classList.add("note");
 
   let lastdate = document.createElement("div");
+  lastdate.className = "lastdate";
   // PDF vs text notes might store last_updated differently
   // If it’s stored in seconds, multiply by 1000 if needed
   // For consistency, let's do:

@@ -35,7 +35,7 @@ impl Notes {
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Folder {
     name: String,
-    created_at: u64,
+    last_updated: u64,
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -88,7 +88,7 @@ fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
 
     let new_folder = Folder {
         name: folder_name.clone(),
-        created_at: std::time::SystemTime::now()
+        last_updated: std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .expect("Time went backwards")
             .as_secs(),
@@ -115,7 +115,7 @@ fn load_data_from_db(state: State<NotesState>) {
         let new_note = Note {
             name: note.1,
             content: note.2,
-            // created_at: note.3 as u64, // Convert i64 to u64
+            // last_updated: note.3 as u64, // Convert i64 to u64
             last_updated: note.3 as u64, // Convert i64 to u64
         };
         println!("Loaded note: {}", new_note.name);

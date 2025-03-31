@@ -18,7 +18,7 @@ pub fn create_connection() -> Result<Connection, rusqlite::Error> {
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             references TEXT NOT NULL,
-            created_at INTEGER NOT NULL,
+            last_updated INTEGER NOT NULL,
         )",
         [],
     )?;
@@ -45,7 +45,7 @@ pub fn create_folder(name: &str) -> Result<i32, String> {
     //get the highest id in the database
     let new_id: i32 = id + 1;
     conn.execute(
-        "INSERT INTO notes (name, references, created_at) VALUES (?1, ?2, ?3)",
+        "INSERT INTO notes (name, references, last_updated) VALUES (?1, ?2, ?3)",
         params![name, "content", chrono::Utc::now().timestamp()],
     )
     .map_err(|e| e.to_string())?;

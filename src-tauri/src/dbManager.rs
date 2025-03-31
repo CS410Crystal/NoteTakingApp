@@ -12,7 +12,7 @@ pub fn create_connection() -> Result<Connection> {
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             content TEXT NOT NULL,
-            created_at INTEGER NOT NULL
+            last_updated INTEGER NOT NULL
         )",
         [],
     )?;
@@ -20,9 +20,8 @@ pub fn create_connection() -> Result<Connection> {
         "CREATE TABLE IF NOT EXISTS folders (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            created_at INTEGER NOT NULL,
+            reference_list TEXT NOT NULL,
             last_updated INTEGER NOT NULL,
-            size INTEGER NOT NULL,
             num_notes INTEGER NOT NULL
         )",
         [],
@@ -47,7 +46,7 @@ pub fn create_note_in_db(name: &str) -> Result<i32, String> {
     //get the highest id in the database
     let new_id: i32 = id + 1;
     conn.execute(
-        "INSERT INTO notes (name, content, created_at) VALUES (?1, ?2, ?3)",
+        "INSERT INTO notes (name, content, last_updated) VALUES (?1, ?2, ?3)",
         params![name, "content", chrono::Utc::now().timestamp()],
     ).map_err(|e| e.to_string())?;
     println!("Ran execute");
@@ -74,7 +73,7 @@ pub fn save_new_note_in_db(name: &str) -> Result<(), String> {
     println!("Tried to run save_new_note_in_db");
     let conn = create_connection().map_err(|e| e.to_string())?;
     conn.execute(
-        "INSERT INTO notes (name, created_at) VALUES (?1, ?3)",
+        "INSERT INTO notes (name, last_updated) VALUES (?1, ?3)",
         params![name, chrono::Utc::now().timestamp()],
     ).map_err(|e| e.to_string())?;
 
@@ -84,7 +83,7 @@ pub fn save_new_note_in_db(name: &str) -> Result<(), String> {
 
 
 //edit note
-pub fn edit_note_in_db(id: i32, name: &str, content: &str) -> Result<()> {
+pub fn edit_note_in_db(id: i32, name: &str, content: &str) -> Result<i64> {
     // conn.execute(
     //     "UPDATE notes SET name = ?1, content = ?2 WHERE id = ?3",
     //     params![name, content, id],
@@ -92,15 +91,16 @@ pub fn edit_note_in_db(id: i32, name: &str, content: &str) -> Result<()> {
     // Ok(())
     println!("Tried to run edit_note_in_db");
     let conn = create_connection().expect("Failed to create database connection");
+    let timestamp = chrono::Utc::now().timestamp();
     conn.execute(
-        "UPDATE notes SET name = ?1, content = ?2 WHERE id = ?3",
-        params![name, content, id],
+        "UPDATE notes SET name = ?1, content = ?2, last_updated = ?3 WHERE id = ?4",
+        params![name, content, timestamp, id],
     )?;
 
     //new
     get_notes_from_db_main_display().expect("Failed to get notes from db_main_display");
 
-    Ok(())
+    Ok(timestamp)
 }
 
 
@@ -115,7 +115,7 @@ pub fn delete_note_from_db(conn: &Connection, id: i32) -> Result<()> {
 pub fn get_notes_from_dbManager() -> Result<Vec<(i32, String, String, i64)>, String> {
     println!("Tried to run get_notes_from_dbManager");
     let conn = create_connection().map_err(|e| e.to_string())?;
-    let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes").map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare("SELECT id, name, content, last_updated FROM notes").map_err(|e| e.to_string())?;
     let note_iter = stmt.query_map([], |row| {
         Ok((
             row.get(0)?,
@@ -130,7 +130,7 @@ pub fn get_notes_from_dbManager() -> Result<Vec<(i32, String, String, i64)>, Str
     }
     //print the notes
     for note in &notes {
-        println!("Got From Manager:\n Note ID: {}, name: {}, content: {}, created_at: {}", note.0, note.1, note.2, note.3);
+        println!("Got From Manager:\n Note ID: {}, name: {}, content: {}, last_updated: {}", note.0, note.1, note.2, note.3);
     }
     Ok(notes)
 }
@@ -140,7 +140,7 @@ pub fn get_notes_from_dbManager() -> Result<Vec<(i32, String, String, i64)>, Str
 pub fn get_notes_from_db_main_display() -> Result<Vec<(String, i64)>, String> {
     println!("Tried to run get_notes_from_db_main_display");
     let conn = create_connection().map_err(|e| e.to_string())?;
-    let mut stmt = conn.prepare("SELECT name, created_at FROM notes").map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare("SELECT name, last_updated FROM notes").map_err(|e| e.to_string())?;
     //print the notes
     
     let note_iter = stmt.query_map([], |row| {
@@ -155,14 +155,14 @@ pub fn get_notes_from_db_main_display() -> Result<Vec<(String, i64)>, String> {
     }
     //print the notes
     for note in &notes {
-        println!("Got From Manager:\n name: {}, created_at: {}", note.0, note.1);
+        println!("Got From Manager:\n name: {}, last_updated: {}", note.0, note.1);
     }
     Ok(notes)
 }
 
 //get note by last_updated (returns a tuple)
 pub fn db_get_note_by_last_updated(conn: &Connection, last_updated: i64) -> Result<(i32, String, String, i64)> {
-    let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE created_at = ?1")?;
+    let mut stmt = conn.prepare("SELECT id, name, content, last_updated FROM notes WHERE last_updated = ?1")?;
     let note_iter = stmt.query_map(params![last_updated], |row| {
         Ok((
             row.get(0)?,
@@ -183,7 +183,7 @@ pub fn db_get_note_by_last_updated(conn: &Connection, last_updated: i64) -> Resu
 pub fn db_get_note_by_id(id: i32) -> Result<(i32, String, String, i64), String> {
     println!("tried to get note by id");
     let conn = create_connection().map_err(|e| e.to_string())?;
-    let mut stmt = conn.prepare("SELECT id, name, content, created_at FROM notes WHERE id = ?1").map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare("SELECT id, name, content, last_updated FROM notes WHERE id = ?1").map_err(|e| e.to_string())?;
     let note_iter = stmt.query_map(params![id], |row| {
         Ok((
             row.get(0)?,
@@ -197,7 +197,7 @@ pub fn db_get_note_by_id(id: i32) -> Result<(i32, String, String, i64), String> 
         notes.push(note.map_err(|e| e.to_string())?);
     }
     //print the note
-    println!("Got From Manager by ID:\n Note ID: {}, name: {}, content: {}, created_at: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
+    println!("Got From Manager by ID:\n Note ID: {}, name: {}, content: {}, last_updated: {}", notes[0].0, notes[0].1, notes[0].2, notes[0].3);
     //return the note
     //print what we're returning:
     println!("Returning note: {:?}", notes[0]);
@@ -221,7 +221,7 @@ pub fn to_string(conn: &Connection) -> String {
 pub fn search_notes_by_content(search_term: String) -> Result<Vec<(i32, String, String, i64)>, String> {
     let conn = create_connection().map_err(|e| e.to_string())?;
     let mut stmt = conn.prepare(
-        "SELECT id, name, content, created_at FROM notes 
+        "SELECT id, name, content, last_updated FROM notes 
         WHERE content LIKE ?1 COLLATE NOCASE"
     ).map_err(|e| e.to_string())?;
     
