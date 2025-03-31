@@ -56,11 +56,12 @@
   </div>
 
   <!-- NEW NOTE FOLDER DIALOG -->
-  <div id="newFolderDialog" class="newFolderDialog">
+  <div id="newFolderDialog" class="newFolderDialog" data="">
     <div class="newFolderDialog-content" style="margin:auto; transform: translate(0%,80%);">
       <p>Enter the name of the new folder:</p>
       <input type="text" id="newFolderName" name="newFolderName" placeholder="Folder Name">
       <button onclick="createNewFolder()">Submit</button>
+      <!-- <button onclick="addNoteToFolder()">Submit</button> -->
       <button onclick="closeNewFolderDialog()">Cancel</button>
     </div>
   </div>
@@ -75,13 +76,13 @@
     </div>
   </div>
 <!-- working here 3/23 -->
-  <div id="newNoteToFolderDialog" class="newNoteToFolderDialog">
+  <div id="newNoteToFolderDialog" class="newNoteToFolderDialog" data="">
     <div class="newNoteToFolderDialog-content" style="margin:auto; transform: translate(0%,80%);">
       <p>Select a folder to add the note to:</p>
       <div id="folderListContainer"></div>
       <!-- we want a button that asks for an existing folder, and another that asks for "create new folder" -->
       <button onclick="displayExistingFolders()">Existing Folder</button>
-      <button onclick="createNewFolder()">Create New Folder</button>
+      <button onclick="openNewFolderDialog()">Create New Folder</button>
       <button onclick="closeNewNoteToFolderDialog()">Later</button>
     </div>
   </div>

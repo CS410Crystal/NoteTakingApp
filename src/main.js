@@ -13,8 +13,11 @@ function closeNav() {
 
 // JJ: NEW CODE START:
 
-function openNewFolderDialog() {
+function openNewFolderDialog() {                                             //data
+  //close the previous window
+  document.getElementById("newNoteToFolderDialog").style.display = "none";
   document.getElementById("newFolderDialog").style.display = "block";
+  // document.getElementById("newFolderDialog").setAttribute("data", data);
 }
 
 function closeNewFolderDialog() {
@@ -29,32 +32,51 @@ function closeExistingFoldersDisplay() {
   document.getElementById("existingFoldersDisplay").style.display = "none";
 }
 // THOUGHTS?
-function createNewFolder() {
+function createNewFolder() {                                                    //data
+  console.log("createNewFolder");
   const folderName = document.getElementById("newFolderName").value;
-  if (!folderName.trim()) {
-    alert("Folder name cannot be empty!");
-    return;
+  if (folderName == null || folderName == "") {
+    return
   }
-  invoke("create_new_folder", { folderName })
-    .then((response) => {
-      if (response) {
-        invoke("save_data_to_database"); //  Save the folder
-        closeNewFolderDialog();
-        alert("Folder created successfully!");
-        //color the file menu button to show where to find folder
-        //check if file menu is open first
-        const filemenu = document.getElementById("filemenu")
-        filemenu.style.backgroundColor = "rgb(0,255,0)"
-        console.log("test")
-      } else {
-        alert("Folder with this name already exists!");
-      }
-    })
-    .catch((error) => {
-      console.error("Error creating folder:", error);
-      alert("Failed to create folder.");
-    });
+  invoke("create_folder_in_db", { name: folderName }).then(() => {              //resonse
+    closeNewFolderDialog();
+    location.reload();
+  }
+  );
 }
+function createFolderAndAddNote() {
+  console.log("createFolderAndAddNote");
+  const folderName = document.getElementById("newFolderName").value;
+  if (folderName == null || folderName == "") {
+    return
+  }
+  invoke("create_folder_in_db", { name: folderName }).then((response) => {
+    console.log(response);
+    closeNewFolderDialog();
+    location.reload();
+  }); 
+  //add the note to the folder
+  const folderId = document.getElementById("newFolderDialog").getAttribute("data");
+  console.log(folderId);
+  invoke("add_note_to_folder_in_db", { folder_id: folderId, note_id: data }).then((response) => {
+    console.log(response);
+    closeNewFolderDialog();
+    location.reload();
+  });
+}
+
+function addToFolder() {                                                  //data
+  console.log("addToFolder");
+  const folderId = document.getElementById("newNoteToFolderDialog").getAttribute("data");
+  console.log(folderId);
+  invoke("add_note_to_folder_in_db", { folder_id: folderId, note_id: data }).then((response) => {
+    console.log(response);
+    closeNewNoteToFolderDialog();
+    location.reload();
+  });
+}
+  //need to add a placeholder for the current note, maybe in dbmanager
+
 
 
 function openNewNoteDialog() {
@@ -65,8 +87,9 @@ function closeNewNoteDialog() {
   document.getElementById("newNoteDialog").style.display = "none";
 }
 
-function openNewNoteToFolderDialog() {
+function openNewNoteToFolderDialog() {//data
   document.getElementById("newNoteToFolderDialog").style.display = "block";
+  // document.getElementById("newNoteToFolderDialog").setAttribute("data", data);
 }
 
 function closeNewNoteToFolderDialog() {
@@ -96,12 +119,16 @@ function createNewNote() {
     let note = [Number(response), noteName, "", Date.now()];
     let note_element = create_note_element(note);
     notes_list.appendChild(note_element);
+
+    closeNewNoteDialog();
+    // let data = response;
+    openNewNoteToFolderDialog(); //data
   });
 }
 
 
 
-const notes_list = document.getElementById("notes_list");//where is notes_list defined?
+const notes_list = document.getElementById("notes_list");
 //Load Notes
 // JJ: NEW CODE START
 function loadNotes() {
@@ -115,14 +142,6 @@ function loadNotes() {
         let note_element = create_note_element(note);
         notes_list.appendChild(note_element);
       }
-      // let notes = JSON.parse(response); //not json
-      // notes.sort(compare_last_updated);
-      // for (const note of notes) {
-      //   let note_element = create_note_element(note);
-      //   //print the note name
-      //   console.log("js: "+note.name)
-      //   notes_list.appendChild(note_element);
-      // }
     })
     invoke("get_folders").then((response) => {
       let folders = JSON.parse(response);
