@@ -12,31 +12,10 @@ use crate::{dbManager, load_data_from_db, Notes, NotesState};
  * return true if success(, false if existing note title)
  */
 #[tauri::command]
-pub fn create_note(state: State<NotesState>, name: String) -> bool {
-    // let note: Note = serde_json::from_str(&object).unwrap();
-    let mut note: Note = Note::new();
-    note.name = name.clone();
-    let mut notes = state.0.lock().unwrap();
-
-    //don't add if same name
-    for lock_note in &notes.note_list {
-        if lock_note.name == name {
-            return false;
-        }
-    }
-    //create connection
-    let con = dbManager::create_connection().expect("Failed to create database connection");
-    return true;
-}
-
-#[tauri::command]
-pub fn edit_note_in_db(state: State<NotesState>, object: String) -> i64 {
+pub fn edit_note_in_db(state: State<NotesState>, object: String) -> bool {
     println!("{}",object);
     let test: (i32, String, String, i64) = serde_json::from_str(&object).unwrap();
     // let mut note: Note = Note::new();
-    
-
-
     let con = dbManager::create_connection().expect("Failed to create database connection");
     let dbNote = dbManager::db_get_note_by_id(test.0).expect("Failed to get note");
     match dbManager::edit_note_in_db(dbNote.0, &test.1, &test.2) {
@@ -72,18 +51,6 @@ pub fn delete_note(id: i32) -> bool {
         }
     }
 }
-
-// remove on 4/7 if no issues
-// #[tauri::command]
-// pub fn get_note_by_name(state: State<NotesState>, name: String) -> String {
-//     let notes = state.0.lock().unwrap();
-//     for test_note in &notes.note_list {
-//         if test_note.name == name {
-//             return serde_json::to_string(&test_note).expect("can't seralize note struct");
-//         }
-//     }
-//     return "note not found".to_string();
-// }
 
 #[tauri::command]
 pub fn text_import(state: State<NotesState>, name: String, content: String) -> bool {
@@ -240,17 +207,4 @@ impl Note {
             last_updated: since_millis,
         };
     }
-}
-
-//public functions to get the elements of Note for the dbManager
-pub  fn get_note_name(note: &Note) -> String {
-    return note.name.clone();
-}
-
-pub fn get_note_content(note: &Note) -> String {
-    return note.content.clone();
-}
-
-pub fn get_note_last_updated(note: &Note) -> u64 {
-    return note.last_updated;
 }
