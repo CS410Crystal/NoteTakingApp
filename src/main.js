@@ -25,7 +25,7 @@ function closeNewFolderDialog() {
 }
 
 function displayExistingFolders() {
-  document.getElementById("existingFoldersDisplay").style.display = "block";
+  document.getElementById("existingFoldersDisplay").style.display;
 }
 
 function closeExistingFoldersDisplay() {
@@ -33,16 +33,48 @@ function closeExistingFoldersDisplay() {
 }
 // THOUGHTS?
 function createNewFolder() {                                                    //data
+  //create a new folder without FOREIGNING the note
   console.log("createNewFolder");
   const folderName = document.getElementById("newFolderName").value;
   if (folderName == null || folderName == "") {
     return
   }
-  invoke("create_folder_in_db", { name: folderName }).then(() => {              //resonse
+  invoke("create_folder_in_db", { name: folderName }).then((response) => {
+    console.log(response);
+    closeNewFolderDialog();
+    location.reload();
+  });
+  //open the new folder dialog
+  document.getElementById("newFolderDialog").style.display = "block";
+}
+
+function newNoteAndNewFolderDialog() {
+  //get current id of the note
+  const noteId = document.getElementById("newNoteDialog").getAttribute("data");
+  console.log(noteId);
+  //open the new folder dialog
+  document.getElementById("newFolderDialog").style.display = "block";
+  //close the new note to folder dialog
+  document.getElementById("newNoteToFolderDialog").style.display = "none";
+  //add the note to the newly created folder
+  invoke("add_note_to_folder_in_db", { folder_id: noteId, note_id: data }).then((response) => {
+    console.log(response);
     closeNewFolderDialog();
     location.reload();
   }
   );
+  //get the folder id
+  const folderId = document.getElementById("newFolderDialog").getAttribute("data");
+  console.log(folderId);
+  //add the note to the folder
+  invoke("add_note_to_folder_in_db", { folder_id: folderId, note_id: data }).then((response) => {
+    console.log(response);
+    closeNewFolderDialog();
+    location.reload();
+  }
+  );
+
+
 }
 function createFolderAndAddNote() {
   console.log("createFolderAndAddNote");

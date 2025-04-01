@@ -273,13 +273,71 @@ button:active {
 }
 
 .existingFoldersDisplay {
+  display: none;
+  overflow-y: auto;
+  /* grid-template-columns: auto auto auto; */
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  z-index: 1;
+
+}
+
+.existingFoldersDisplay-content {
+  z-index: 1;
+  width: 30%;
+  min-width: 300px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: darkgray;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  animation-duration: 0.4s}
+
+.existingFoldersDisplay-content h2 {
+  margin-bottom: 20px;
+}
+.existingFoldersDisplay-content input {
   width: 100%;
   padding: 10px;
   margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  display:none
 }
+.existingFoldersDisplay-content button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0e0041;
+  color: #fff;
+  cursor: pointer;
+}
+.existingFoldersDisplay-content button:hover {
+  background-color: darkgreen;
+}
+.existingFoldersDisplay-content button:active {
+  background-color: darkolivegreen;
+}
+.existingFoldersDisplay-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+  color: darkblue;
+}
+.existingFoldersDisplay-header h2 {
+  margin: 0;
+}
+
+
+
 
 
 
@@ -356,7 +414,7 @@ button:active {
 
 /* JJ: END NEW CODE */
 
-#notes_list {
+#notes_list {                                                                   /*notes_list*/
   display: grid;
   /* height: 500px; */
   /* height: 100%; */

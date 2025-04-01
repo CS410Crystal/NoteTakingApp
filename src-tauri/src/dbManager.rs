@@ -23,7 +23,7 @@ pub fn create_connection() -> Result<Connection> {
             reference_list TEXT NOT NULL,
             last_updated INTEGER NOT NULL,
             num_notes INTEGER NOT NULL
-        )",
+            )",
         [],
         //did have FOREIGN KEY (id) REFERENCES notes(id) at the end
     )?;

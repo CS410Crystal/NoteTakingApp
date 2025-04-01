@@ -81,7 +81,7 @@
       <div id="folderListContainer"></div>
       <!-- we want a button that asks for an existing folder, and another that asks for "create new folder" -->
       <button onclick="displayExistingFolders()">Existing Folder</button>
-      <button onclick="openNewFolderDialog()">Create New Folder</button>
+      <button onclick="newNoteAndNewFolderDialog()">Create New Folder</button>
       <button onclick="closeNewNoteToFolderDialog()">Later</button>
     </div>
   </div>
@@ -112,9 +112,8 @@
       <button id="edit-tab-save">Save Note</button><span id="edit-tab-save-status" style="color:black; visibility: hidden;">Saved!</span>
       <textarea id="edit_note" style="height: 90%; width: 100%;"></textarea>
       <button id="delete_note">Delete Note</button>
+      </div>
     </div>
-  </div>
-
   <div
   id="pdfViewerModal"
   class="pdfViewerModal"
@@ -153,8 +152,18 @@
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search notes by name..." onkeyup="searchNotes()">
     <input type="text" id="contentSearchInput" placeholder="Search notes by content... (press enter)" 
-       onkeydown="handleContentSearch(event)" autocomplete="off">
+        onkeydown="handleContentSearch(event)" autocomplete="off">
   </div>
+
+  <!-- <div class="folders_list">
+    <div class="folders_list-content" style="margin:auto; transform: translate(0%,80%);">
+      <p>Folders:</p>
+      <div id="folderListContainer"></div>
+      <button onclick="closeFolderList()">Close</button>
+    </div>
+  </div> -->
+
+
   <!-- Possible Plan: name search and tag search? Tags allow sorting by notes that have overlapping identities (such as class and year) -->
   <main class="container" id="notes_list">
 
