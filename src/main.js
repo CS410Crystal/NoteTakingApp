@@ -13,11 +13,8 @@ function closeNav() {
 
 // JJ: NEW CODE START:
 
-function openNewFolderDialog() {                                             //data
-  //close the previous window
-  document.getElementById("newNoteToFolderDialog").style.display = "none";
+function openNewFolderDialog() {
   document.getElementById("newFolderDialog").style.display = "block";
-  // document.getElementById("newFolderDialog").setAttribute("data", data);
 }
 
 function closeNewFolderDialog() {
@@ -25,87 +22,38 @@ function closeNewFolderDialog() {
 }
 
 function displayExistingFolders() {
-  document.getElementById("existingFoldersDisplay").style.display;
+  document.getElementById("existingFoldersDisplay").style.display = "block";
 }
 
 function closeExistingFoldersDisplay() {
   document.getElementById("existingFoldersDisplay").style.display = "none";
 }
 // THOUGHTS?
-function createNewFolder() {                                                    //data
-  //create a new folder without FOREIGNING the note
-  console.log("createNewFolder");
+function createNewFolder() {
   const folderName = document.getElementById("newFolderName").value;
-  if (folderName == null || folderName == "") {
-    return
+  if (!folderName.trim()) {
+    alert("Folder name cannot be empty!");
+    return;
   }
-  invoke("create_folder_in_db", { name: folderName }).then((response) => {
-    console.log(response);
-    closeNewFolderDialog();
-    location.reload();
-  });
-  //open the new folder dialog
-  document.getElementById("newFolderDialog").style.display = "block";
-}
-
-function newNoteAndNewFolderDialog() {
-  //get current id of the note
-  const noteId = document.getElementById("newNoteDialog").getAttribute("data");
-  console.log(noteId);
-  //open the new folder dialog
-  document.getElementById("newFolderDialog").style.display = "block";
-  //close the new note to folder dialog
-  document.getElementById("newNoteToFolderDialog").style.display = "none";
-  //add the note to the newly created folder
-  invoke("add_note_to_folder_in_db", { folder_id: noteId, note_id: data }).then((response) => {
-    console.log(response);
-    closeNewFolderDialog();
-    location.reload();
-  }
-  );
-  //get the folder id
-  const folderId = document.getElementById("newFolderDialog").getAttribute("data");
-  console.log(folderId);
-  //add the note to the folder
-  invoke("add_note_to_folder_in_db", { folder_id: folderId, note_id: data }).then((response) => {
-    console.log(response);
-    closeNewFolderDialog();
-    location.reload();
-  }
-  );
-
-
-}
-function createFolderAndAddNote() {
-  console.log("createFolderAndAddNote");
-  const folderName = document.getElementById("newFolderName").value;
-  if (folderName == null || folderName == "") {
-    return
-  }
-  invoke("create_folder_in_db", { name: folderName }).then((response) => {
-    console.log(response);
-    closeNewFolderDialog();
-    location.reload();
-  }); 
-  //add the note to the folder
-  const folderId = document.getElementById("newFolderDialog").getAttribute("data");
-  console.log(folderId);
-  invoke("add_note_to_folder_in_db", { folder_id: folderId, note_id: data }).then((response) => {
-    console.log(response);
-    closeNewFolderDialog();
-    location.reload();
-  });
-}
-
-function addToFolder() {                                                  //data
-  console.log("addToFolder");
-  const folderId = document.getElementById("newNoteToFolderDialog").getAttribute("data");
-  console.log(folderId);
-  invoke("add_note_to_folder_in_db", { folder_id: folderId, note_id: data }).then((response) => {
-    console.log(response);
-    closeNewNoteToFolderDialog();
-    location.reload();
-  });
+  invoke("create_folder_in_db", { name: folderName })
+    .then((response) => {
+      if (response) {
+        // invoke("save_data_to_database"); //  Save the folder
+        closeNewFolderDialog();
+        alert("Folder created successfully!");
+        //color the file menu button to show where to find folder
+        //check if file menu is open first
+        const filemenu = document.getElementById("filemenu")
+        filemenu.style.backgroundColor = "rgb(0,255,0)"
+        console.log("test")
+      } else {
+        alert("Folder with this name already exists!");
+      }
+    })
+    .catch((error) => {
+      console.error("Error creating folder:", error);
+      alert("Failed to create folder.");
+    });
 }
 
 
@@ -117,9 +65,8 @@ function closeNewNoteDialog() {
   document.getElementById("newNoteDialog").style.display = "none";
 }
 
-function openNewNoteToFolderDialog() {//data
+function openNewNoteToFolderDialog() {
   document.getElementById("newNoteToFolderDialog").style.display = "block";
-  // document.getElementById("newNoteToFolderDialog").setAttribute("data", data);
 }
 
 function closeNewNoteToFolderDialog() {
@@ -140,7 +87,7 @@ function createNewNote() {
   invoke("create_note_in_db", { name: noteName }).then((response) => {
     invoke("save_new_note_in_db")//save the data in db (appears we're doing)
     //should return a string
-
+    // working here 3/23
     // addToFolderDialog(noteName, response);
     closeNewNoteDialog();
     openNewNoteToFolderDialog();
@@ -149,15 +96,12 @@ function createNewNote() {
     let note = [Number(response), noteName, "", Date.now()];
     let note_element = create_note_element(note);
     notes_list.appendChild(note_element);
-
-    closeNewNoteDialog();
-    openNewNoteToFolderDialog(); //data
   });
 }
 
 
 
-const notes_list = document.getElementById("notes_list");
+const notes_list = document.getElementById("notes_list");//where is notes_list defined?
 //Load Notes
 // JJ: NEW CODE START
 function loadNotes() {
@@ -173,7 +117,9 @@ function loadNotes() {
       }
     })
     invoke("get_folders").then((response) => {
-      let folders = JSON.parse(response);
+      console.log(response)
+      let folders = response;
+      // let folders = JSON.parse(response);
       for (const folder of folders) {
         let folder_element = create_folder_element(folder);
         notes_list.appendChild(folder_element);
@@ -368,7 +314,7 @@ function create_note_element(note) {
 function create_folder_element(folder) {
   let folder_element = document.createElement("div");
   folder_element.classList.add("folder-item");
-  folder_element.innerText = `📁 ${folder.name}`;
+  folder_element.innerText = `📁 ${folder[1]}`;
   folder_element.style.width = "200px";
   folder_element.style.height = "50px";
   folder_element.style.padding = "10px";
@@ -379,9 +325,10 @@ function create_folder_element(folder) {
   folder_element.style.display = "flex";
   folder_element.style.alignItems = "center";
   folder_element.style.justifyContent = "center";
+  folder_element.style.color = "#000"
 
   folder_element.addEventListener("click", function () {
-    alert(`Opening folder: ${folder.name}`);
+    alert(`Opening folder: ${folder[1]}`);
   });
 
   return folder_element;
@@ -429,7 +376,9 @@ function dateSort() {
 function showFolders() {
   notes_list.innerHTML = "";
   invoke("get_folders").then((response) => {
-    let folders = JSON.parse(response);
+    console.log(response)
+    let folders = response;
+    // let folders = JSON.parse(response);
     if (folders.length === 0) {
       const emptyMessage = document.createElement("p");
       emptyMessage.innerText = "No folders available.";

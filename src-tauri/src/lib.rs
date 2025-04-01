@@ -3,6 +3,7 @@ mod note;
 mod folder;
 mod dbManager;
 
+use folder::{create_folder, get_folders};
 use note::{delete_note, text_import, pdf_import, docx_import,  Note};
 use dbManager::{create_note_in_db, create_folder_in_db, db_get_note_by_id, 
     get_notes_from_dbManager, get_notes_from_db_main_display, add_note_to_folder_in_db, search_notes_by_content};
@@ -76,33 +77,33 @@ fn save_data(notes_state: State<NotesState>, folders_state: State<FoldersState>)
 }
 
 
-#[tauri::command]
-fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
-    let mut folders = state.0.lock().unwrap();
+// #[tauri::command]
+// fn create_new_folder(state: State<FoldersState>, folder_name: String) -> bool {
+//     let mut folders = state.0.lock().unwrap();
 
-    // Prevent duplicate folder names
-    for folder in &folders.folder_list {
-        if folder.name == folder_name {
-            return false;
-        }
-    }
+//     // Prevent duplicate folder names
+//     for folder in &folders.folder_list {
+//         if folder.name == folder_name {
+//             return false;
+//         }
+//     }
 
-    let new_folder = Folder {
-        name: folder_name.clone(),
-        last_updated: std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_secs(),
-    };
+//     let new_folder = Folder {
+//         name: folder_name.clone(),
+//         last_updated: std::time::SystemTime::now()
+//             .duration_since(std::time::UNIX_EPOCH)
+//             .expect("Time went backwards")
+//             .as_secs(),
+//     };
 
-    folders.folder_list.push(new_folder);
+//     folders.folder_list.push(new_folder);
     
-    // Save to file
-    fs::write(SAVEFILE, folders.serial()).expect("Unable to write file");
+//     // Save to file
+//     fs::write(SAVEFILE, folders.serial()).expect("Unable to write file");
 
-    println!("Created new folder: {}", folder_name);
-    return true;
-}
+//     println!("Created new folder: {}", folder_name);
+//     return true;
+// }
 
 
 #[tauri::command]
@@ -159,8 +160,10 @@ pub fn run() {
             text_import,
             pdf_import,
             docx_import,
-            search_notes_by_content
-            // create_new_folder,  //  Register the function
+            search_notes_by_content,
+            create_folder,
+            create_folder_in_db,
+            get_folders,  //  Register the function
             //new functions
         ])
         .run(tauri::generate_context!())

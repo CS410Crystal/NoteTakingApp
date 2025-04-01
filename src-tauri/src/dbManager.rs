@@ -20,7 +20,7 @@ pub fn create_connection() -> Result<Connection> {
         "CREATE TABLE IF NOT EXISTS folders (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            reference_list TEXT NOT NULL,
+            reference_list TEXT,
             last_updated INTEGER NOT NULL,
             num_notes INTEGER NOT NULL
             )",
@@ -59,8 +59,8 @@ pub fn create_folder_in_db (name: &str) -> Result<i32, String> {
     //get the highest id in the database
     let new_id: i32 = id + 1;
     conn.execute(
-        "INSERT INTO folders (name, created_at, last_updated, size, num_notes) VALUES (?1, ?2, ?3, ?4, ?5)",
-        params![name, chrono::Utc::now().timestamp(), chrono::Utc::now().timestamp(), 0, 0],
+        "INSERT INTO folders (name, reference_list, last_updated, num_notes) VALUES (?1, ?2, ?3, ?4)",
+        params![name, "", chrono::Utc::now().timestamp(), 0],
     ).map_err(|e| e.to_string())?;
 
     Ok(new_id)

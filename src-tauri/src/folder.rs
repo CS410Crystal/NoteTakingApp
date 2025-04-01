@@ -17,8 +17,8 @@ pub fn create_connection() -> Result<Connection, rusqlite::Error> {
         "CREATE TABLE IF NOT EXISTS folders (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            references TEXT NOT NULL,
-            last_updated INTEGER NOT NULL,
+            reference_list TEXT,
+            last_updated INTEGER NOT NULL
         )",
         [],
     )?;
@@ -45,8 +45,8 @@ pub fn create_folder(name: &str) -> Result<i32, String> {
     //get the highest id in the database
     let new_id: i32 = id + 1;
     conn.execute(
-        "INSERT INTO notes (name, references, last_updated) VALUES (?1, ?2, ?3)",
-        params![name, "content", chrono::Utc::now().timestamp()],
+        "INSERT INTO folders (name, reference_list, last_updated) VALUES (?1, ?2, ?3)",
+        params![name, "", chrono::Utc::now().timestamp()],
     )
     .map_err(|e| e.to_string())?;
     println!("Ran execute");
@@ -58,11 +58,30 @@ pub fn create_folder(name: &str) -> Result<i32, String> {
  * Gets the list of folders
  */
 #[tauri::command]
-pub fn get_folders() -> Result<String, String> {
+pub fn get_folders() -> Result<Vec<(i32, String, String, i64)>, String> {
     let conn = create_connection().map_err(|e| e.to_string())?;
     //loop folders
     //export as JSON
-    Ok("".to_string())
+    println!("Tried to run get_folders");
+    let mut stmt = conn.prepare("SELECT id, name, reference_list, last_updated FROM folders").map_err(|e| e.to_string())?;
+    let folder_iter = stmt.query_map([], |row| {
+        Ok((
+            row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+            row.get(3)?,
+        ))
+    }).map_err(|e| e.to_string())?;
+    let mut folders = Vec::new();
+    for folder in folder_iter {
+        folders.push(folder.map_err(|e| e.to_string())?);
+    }
+    //print the folders (debug)
+    for folder in &folders {
+        println!("Got From Manager:\n Folder ID: {}, name: {}, references: {}, last_updated: {}", folder.0, folder.1, folder.2, folder.3);
+    }
+
+    Ok(folders)
 }
 
 /**
