@@ -4,6 +4,9 @@ const { invoke } = window.__TAURI__.core;
 
 
 function openNav() {
+  //change background color of file menu button to no background color
+  const filemenu = document.getElementById("filemenu")
+  filemenu.style.backgroundColor = "transparent"
   document.getElementById("theSidenav").style.width = "250px";
 }
 
@@ -14,6 +17,7 @@ function closeNav() {
 // JJ: NEW CODE START:
 
 function openNewFolderDialog() {
+  document.getElementById("newNoteToFolderDialog").style.display = "none";
   document.getElementById("newFolderDialog").style.display = "block";
 }
 
@@ -44,7 +48,8 @@ function createNewFolder() {
         //color the file menu button to show where to find folder
         //check if file menu is open first
         const filemenu = document.getElementById("filemenu")
-        filemenu.style.backgroundColor = "rgb(0,255,0)"
+        filemenu.style.backgroundColor = "rgb(9, 126, 52)"
+        //filemenu border color to green
         console.log("test")
       } else {
         alert("Folder with this name already exists!");
@@ -85,7 +90,6 @@ function createNewNote() {
   }
   //here we need to createe the note in database (appears we're doing)
   invoke("create_note_in_db", { name: noteName }).then((response) => {
-    invoke("save_new_note_in_db")//save the data in db (appears we're doing)
     //should return a string
     // working here 3/23
     // addToFolderDialog(noteName, response);
