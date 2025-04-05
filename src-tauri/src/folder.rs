@@ -121,3 +121,65 @@ pub fn folder_delete_shift(id: i32) {
             //delete id if equal to id
         //replace folder list with edited list
 }
+
+#[tauri::command]
+pub fn edit_folder_in_db(object: String) -> i64 {
+    println!("{}",object);
+    let test: (i32, String, String, i64) = serde_json::from_str(&object).unwrap();
+    // let mut note: Note = Note::new();
+    let _con = create_connection().expect("Failed to create database connection");
+    let db_folder = db_get_folder_by_id(test.0).expect("Failed to get note");
+    println!("folder id to edit: {}",test.0);
+    match edit_folder_in_db_internal(test.0, &test.1, &test.2) {
+        Ok(value) => {
+            println!("Edited folder in database file: {}", test.1);
+            return value;
+        }
+        Err(e) => {
+            eprintln!("Failed to edit folder: {}", e);
+            return -1
+        }
+    }
+}
+
+#[tauri::command]
+pub fn db_get_folder_by_id(id: i32) -> Result<(i32, String, String, i64), String> {
+    println!("tried to get folder by id");
+    let conn = create_connection().map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare("SELECT id, name, reference_list, last_updated FROM folders WHERE id = ?1").map_err(|e| e.to_string())?;
+    let folder_iter = stmt.query_map(params![id], |row| {
+        Ok((
+            row.get(0)?,
+            row.get(1)?,
+            row.get(2)?,
+            row.get(3)?,
+        ))
+    }).map_err(|e| e.to_string())?;
+    let mut folders = Vec::new();
+    for folder in folder_iter {
+        folders.push(folder.map_err(|e| e.to_string())?);
+    }
+    //print the note
+    println!("Got From Manager by ID:\n Folder ID: {}, name: {}, reference_list: {}, last_updated: {}", folders[0].0, folders[0].1, folders[0].2, folders[0].3);
+    //return the note
+    //print what we're returning:
+    println!("Returning note: {:?}", folders[0]);
+
+    Ok(folders[0].clone())
+
+}
+
+pub fn edit_folder_in_db_internal(id: i32, name: &str, reference_list: &str) -> Result<i64, rusqlite::Error> {
+
+    let conn = create_connection().expect("Failed to create database connection");
+    let timestamp = chrono::Utc::now().timestamp();
+    conn.execute(
+        "UPDATE folders SET name = ?1, reference_list = ?2, last_updated = ?3 WHERE id = ?4",
+        params![name, reference_list, timestamp, id],
+    )?;
+
+    //new
+    // get_notes_from_db_main_display().expect("Failed to get notes from db_main_display");
+
+    Ok(timestamp)
+}

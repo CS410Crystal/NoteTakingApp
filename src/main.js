@@ -144,6 +144,14 @@ function closeEditNoteDialog() {
   document.getElementById("editNoteDialog").style.display = "none";
 }
 
+function openEditFolderDialog() {
+  document.getElementById("editNoteDialog").style.display = "block";
+}
+
+function closeEditFolderDialog() {
+  document.getElementById("editNoteDialog").style.display = "none";
+}
+
 /**
  * Compare notes by last updated
  * Prefers to show newer notes first
@@ -203,6 +211,9 @@ const edit_name = document.getElementById("edit-name");
 
 let currently_editing_note;
 let currently_editing_note_element;
+
+let currently_editing_folder;
+let currently_editing_folder_element;
 
 const edit_tab_close = document.getElementById("edit-tab_close");
 edit_tab_close.addEventListener("click", function () {
@@ -305,6 +316,7 @@ function create_note_element(note) {
           note_element_editing = button;
 
           lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
+
         } else {
           console.error("Note not found with name: " + note[1]);
         }
@@ -315,9 +327,11 @@ function create_note_element(note) {
   return note_element;
 }
 
+const input_edit_name_folder = document.getElementById("input-edit-name-folder")
+
 function create_folder_element(folder) {
   let folder_element = document.createElement("div");
-  folder_element.classList.add("folder-item");
+  folder_element.classList.add("folder_item");
   folder_element.innerText = `📁 ${folder[1]}`;
   folder_element.style.width = "200px";
   folder_element.style.height = "50px";
@@ -331,11 +345,119 @@ function create_folder_element(folder) {
   folder_element.style.justifyContent = "center";
   folder_element.style.color = "#000"
 
-  folder_element.addEventListener("click", function () {
-    alert(`Opening folder: ${folder[1]}`);
+  let folder_edit_element = document.createElement("button");
+  folder_edit_element.textContent = "Edit"
+  folder_edit_element.style.visibility = "hidden"
+  folder_edit_element.style.position = "static"
+  folder_element.appendChild(folder_edit_element)
+
+  folder_element.addEventListener("mouseover",function() {
+    folder_edit_element.style.visibility = "visible"
+  })
+  folder_element.addEventListener("mouseout",function() {
+    folder_edit_element.style.visibility = "hidden"
+  })
+
+  folder_edit_element.addEventListener("click", function () {
+    // alert(`Opening folder: ${folder[1]}`);
+    let edit_folder_container = document.getElementById("edit-folder-container");
+    edit_folder_container.style.display = "block";
+    // let edit_folder = document.getElementById("folder-edit-tab");
+    document.getElementById("input-edit-name-folder").value = folder[1]
+
+    let note_list = document.getElementById("folder-note-list");
+
+    while (note_list.firstChild) {
+      note_list.removeChild(note_list.lastChild)
+    }
+
+    invoke("get_notes_from_dbManager").then((response) => {
+      // This returns an array of [name, last_updated], so handle accordingly:
+      // e.g. let notes = response.map( ... ) or adapt as needed
+      console.log(response);
+      response.sort((a, b) => b[3] - a[3]); // Sort by last_updated desc
+      for (const note of response) {
+        //create a separate note element for folder
+        create_note_element_for_folder(note)
+      }
+    });
+
+    
+
+
+    invoke("db_get_folder_by_id", { id: folder[0] }).then((response) => {
+      if (response !== "note not found") {
+        let folder_response = response;
+        edit_folder_container.style.display = "block";
+        edit_name.innerText = "Editing Note Name: " + folder_response[1];
+        currently_editing_folder = folder_response;
+        currently_editing_folder_element = folder_element;
+        input_edit_name_folder.value = folder_response[1];
+        
+        // edit_note.innerText = note_response[2];
+        // edit_note.value = note_response[2];
+        // TODO check every existing note
+
+        folder_element_editing = folder_element;
+
+        // lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
+
+      } else {
+        console.error("Note not found with name: " + note[1]);
+      }
+    });
   });
 
   return folder_element;
+}
+
+document.getElementById("folder-edit-tab_close").addEventListener("click", function() {
+  let edit_folder_container = document.getElementById("edit-folder-container");
+    edit_folder_container.style.display = "none";
+})
+
+let folder_element_editing = undefined
+
+document.getElementById("folder-edit-tab-save").addEventListener("click", function() {
+  if (currently_editing_folder != null) {
+    let input_edit_name_folder = document.getElementById("input-edit-name-folder");
+    currently_editing_folder[1] = input_edit_name_folder.value;
+    // currently_editing_folder[2] = edit_note.value;
+
+
+    currently_editing_folder[3] = Date.now();
+  }
+  const folder_name_edit = document.getElementById("input-edit-name-folder")
+  const object = JSON.stringify(currently_editing_folder);
+  console.log(object)
+  invoke("edit_folder_in_db", {object: object }).then((response) => {
+    console.log("success");
+    if (folder_element_editing != null) {
+      folder_element_editing.childNodes[0].nodeValue = `📁 ${folder_name_edit.value}`;
+      console.log(response)
+      // folder_element_editing.parentElement.getElementsByClassName('lastdate')[0].textContent = timeAgo(response * 1000);
+    }
+    const status = document.getElementById("edit-tab-folder-save-status");
+    if (status.style.getPropertyValue("visibility") === "hidden") {
+      status.style.setProperty("visibility", "visible");
+    }
+    if (status.style.getPropertyValue("color") === "black") {
+      status.style.setProperty("color", "lime");
+    } else {
+      status.style.setProperty("color", "black");
+    }
+  });
+})
+
+function create_note_element_for_folder(note) {
+  let note_list = document.getElementById("folder-note-list");
+
+  let note_element = document.createElement("div")
+  note_element.innerText = note[1];
+  note_list.appendChild(note_element)
+  let note_element_checkbox = document.createElement("input");
+  note_element_checkbox.type = "checkbox"
+  note_element.appendChild(note_element_checkbox)
 }
 
 // Sorting / Searching

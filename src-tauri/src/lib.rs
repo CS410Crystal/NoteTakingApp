@@ -3,7 +3,7 @@ mod note;
 mod folder;
 mod dbManager;
 
-use folder::{create_folder, get_folders};
+use folder::{create_folder, db_get_folder_by_id, edit_folder_in_db, get_folders};
 use note::{delete_note, text_import, pdf_import, docx_import,  Note};
 use dbManager::{create_note_in_db, create_folder_in_db, db_get_note_by_id, 
     get_notes_from_dbManager, get_notes_from_db_main_display, add_note_to_folder_in_db, search_notes_by_content};
@@ -164,6 +164,8 @@ pub fn run() {
             create_folder,
             create_folder_in_db,
             get_folders,  //  Register the function
+            db_get_folder_by_id,
+            edit_folder_in_db
             //new functions
         ])
         .run(tauri::generate_context!())
