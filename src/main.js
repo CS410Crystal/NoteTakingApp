@@ -329,6 +329,8 @@ function create_note_element(note) {
 
 const input_edit_name_folder = document.getElementById("input-edit-name-folder")
 
+const note_list = document.getElementById("folder-note-list");
+
 function create_folder_element(folder) {
   let folder_element = document.createElement("div");
   folder_element.classList.add("folder_item");
@@ -339,7 +341,6 @@ function create_folder_element(folder) {
   folder_element.style.border = "1px solid gray";
   folder_element.style.marginBottom = "5px";
   folder_element.style.cursor = "pointer";
-  folder_element.style.backgroundColor = "#e6e6e6";
   folder_element.style.display = "flex";
   folder_element.style.alignItems = "center";
   folder_element.style.justifyContent = "center";
@@ -351,10 +352,10 @@ function create_folder_element(folder) {
   folder_edit_element.style.position = "static"
   folder_element.appendChild(folder_edit_element)
 
-  folder_element.addEventListener("mouseover",function() {
+  folder_element.addEventListener("mouseover", function () {
     folder_edit_element.style.visibility = "visible"
   })
-  folder_element.addEventListener("mouseout",function() {
+  folder_element.addEventListener("mouseout", function () {
     folder_edit_element.style.visibility = "hidden"
   })
 
@@ -363,9 +364,8 @@ function create_folder_element(folder) {
     let edit_folder_container = document.getElementById("edit-folder-container");
     edit_folder_container.style.display = "block";
     // let edit_folder = document.getElementById("folder-edit-tab");
+    document.getElementById("folder-edit-name").innerText = "Editing Folder Name: " + folder[1];
     document.getElementById("input-edit-name-folder").value = folder[1]
-
-    let note_list = document.getElementById("folder-note-list");
 
     while (note_list.firstChild) {
       note_list.removeChild(note_list.lastChild)
@@ -382,7 +382,7 @@ function create_folder_element(folder) {
       }
     });
 
-    
+
 
 
     invoke("db_get_folder_by_id", { id: folder[0] }).then((response) => {
@@ -393,12 +393,30 @@ function create_folder_element(folder) {
         currently_editing_folder = folder_response;
         currently_editing_folder_element = folder_element;
         input_edit_name_folder.value = folder_response[1];
-        
-        // edit_note.innerText = note_response[2];
-        // edit_note.value = note_response[2];
-        // TODO check every existing note
 
+        // check every existing note
         folder_element_editing = folder_element;
+        let reference_list = JSON.parse(folder[2]);
+        console.log(reference_list)
+        let notes_to_check = document.querySelectorAll(".note_element_checkbox")
+        for (let i = 0; i < notes_to_check.length; ++i) {
+          let match_id = notes_to_check[i].value
+
+          let found_index = undefined
+          for (let j = 0; j < reference_list.length; ++j) {
+            if (reference_list[j] == match_id) {
+              notes_to_check[i].checked = true;
+              found_index = j;
+              break;
+            }
+          }
+          if (found_index != undefined) {
+            reference_list.splice(found_index, 1);
+          }
+          if (reference_list.length == 0) {
+            break;
+          }
+        }
 
         // lastdate.innerText = timeAgo(Number(note_response[3]) * 1000);
 
@@ -411,26 +429,43 @@ function create_folder_element(folder) {
   return folder_element;
 }
 
-document.getElementById("folder-edit-tab_close").addEventListener("click", function() {
+document.getElementById("folder-edit-tab_close").addEventListener("click", function () {
   let edit_folder_container = document.getElementById("edit-folder-container");
-    edit_folder_container.style.display = "none";
+  edit_folder_container.style.display = "none";
+
+  const status = document.getElementById("edit-tab-folder-save-status");
+    if (status.style.getPropertyValue("visibility") === "visible") {
+      status.style.setProperty("visibility", "hidden");
+    }
 })
 
 let folder_element_editing = undefined
 
-document.getElementById("folder-edit-tab-save").addEventListener("click", function() {
+document.getElementById("folder-edit-tab-save").addEventListener("click", function () {
   if (currently_editing_folder != null) {
     let input_edit_name_folder = document.getElementById("input-edit-name-folder");
     currently_editing_folder[1] = input_edit_name_folder.value;
     // currently_editing_folder[2] = edit_note.value;
 
+    //loop through
+
+    let folder_references = [];
+
+    let notes_to_check = document.querySelectorAll(".note_element_checkbox")
+    for (let i = 0; i < notes_to_check.length; ++i) {
+      if (notes_to_check[i].checked == true) {
+        // console.log(notes_to_check[i].value)
+        folder_references.push(Number(notes_to_check[i].value))
+      }
+    }
+    currently_editing_folder[2] = JSON.stringify(folder_references);
 
     currently_editing_folder[3] = Date.now();
   }
   const folder_name_edit = document.getElementById("input-edit-name-folder")
   const object = JSON.stringify(currently_editing_folder);
   console.log(object)
-  invoke("edit_folder_in_db", {object: object }).then((response) => {
+  invoke("edit_folder_in_db", { object: object }).then((response) => {
     console.log("success");
     if (folder_element_editing != null) {
       folder_element_editing.childNodes[0].nodeValue = `📁 ${folder_name_edit.value}`;
@@ -450,13 +485,14 @@ document.getElementById("folder-edit-tab-save").addEventListener("click", functi
 })
 
 function create_note_element_for_folder(note) {
-  let note_list = document.getElementById("folder-note-list");
 
   let note_element = document.createElement("div")
   note_element.innerText = note[1];
   note_list.appendChild(note_element)
   let note_element_checkbox = document.createElement("input");
   note_element_checkbox.type = "checkbox"
+  note_element_checkbox.value = note[0];
+  note_element_checkbox.classList.add("note_element_checkbox")
   note_element.appendChild(note_element_checkbox)
 }
 

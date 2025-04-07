@@ -2,7 +2,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use tauri::State;
 
-use crate::{dbManager, load_data_from_db, Notes, NotesState};
+use crate::{dbManager, folder::folder_delete_shift, load_data_from_db, Notes, NotesState};
 
 // use crate::dbManager::{db_get_note_by_name};
 
@@ -39,6 +39,7 @@ pub fn delete_note(id: i32) -> bool {
     let con = dbManager::create_connection().expect("Failed to create database connection");
     let dbNote = dbManager::db_get_note_by_id(id).expect("Failed to get note");
     //delete note in db
+    folder_delete_shift(id).expect("cannot shift");
     match dbManager::delete_note_from_db(&con, dbNote.0) {
         Ok(_) => {
             println!("Deleted note from database: {}", id);
