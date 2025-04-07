@@ -35,7 +35,7 @@ pub fn create_connection() -> Result<Connection, rusqlite::Error> {
 pub fn create_folder(name: &str) -> Result<i32, String> {
     //get the largest id in the database
     println!("name: {}", name);
-    println!("Tried to run create_folder_in_db");
+    println!("Tried to run create_folder function in folder.rs");
     let conn = create_connection().map_err(|e| e.to_string())?;
     //get the largest id in the database
     let id = get_largest_id(&conn).map_err(|e| e.to_string())?;

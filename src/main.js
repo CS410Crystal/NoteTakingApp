@@ -496,6 +496,46 @@ function create_note_element_for_folder(note) {
   note_element.appendChild(note_element_checkbox)
 }
 
+//delete folder from the database
+document.getElementById("delete_folder").addEventListener("click", function() {
+  print("delete folder");
+  if (!currently_editing_folder) {
+    return;
+  }
+  invoke("delete_folder_from_db", { id: currently_editing_folder[0] }).then((response) => {
+    if (response === true) {
+      edit_container.style.removeProperty("display");
+      edit_name.innerText = "Editing Note Name: {}";
+      currently_editing_folder_element.parentElement.remove();
+      currently_editing_folder_element = null;
+    }
+  });
+  //refresh the folder list
+  notes_list.innerHTML = "";
+  invoke("get_folders").then((response) => {
+    console.log(response)
+    let folders = response;
+    // let folders = JSON.parse(response);
+    if (folders.length === 0) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.innerText = "No folders available.";
+      notes_list.appendChild(emptyMessage);
+    }
+    for (const folder of folders) {
+      let folder_element = create_folder_element(folder);
+      notes_list.appendChild(folder_element);
+    }
+  });
+  //close the folder edit dialog
+  let edit_folder_container = document.getElementById("edit-folder-container");
+  edit_folder_container.style.display = "none";
+  //close the edit note dialog
+  edit_container.style.removeProperty("display");
+  edit_name.innerText = "Editing Note Name: {}";
+  currently_editing_folder_element.parentElement.remove();
+  currently_editing_folder_element = null;
+}
+)
 // Sorting / Searching
 let lastArray = undefined;
 function alphabetSort() {

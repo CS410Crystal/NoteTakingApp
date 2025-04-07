@@ -67,6 +67,15 @@ pub fn create_folder_in_db (name: &str) -> Result<i32, String> {
 }
 
 #[tauri::command]
+pub fn delete_folder_from_db(id: i32) -> Result<(), String> {
+    println!("Tried to run delete_folder_from_db");
+    let conn = create_connection().map_err(|e| e.to_string())?;
+    conn.execute("DELETE FROM folders WHERE id = ?1", params![id]).map_err(|e| e.to_string())?;
+    Ok(())
+}
+//
+
+#[tauri::command]
 pub fn add_note_to_folder_in_db(folder_id: i32, note_id: i32) -> Result<(), String> {
     let conn = create_connection().map_err(|e| e.to_string())?;
     conn.execute(
