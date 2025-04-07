@@ -12,7 +12,11 @@ pub fn create_connection() -> Result<Connection> {
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             content TEXT NOT NULL,
-            last_updated INTEGER NOT NULL
+            last_updated INTEGER NOT NULL,
+            folder_id INTEGER,
+                FOREIGN KEY (folder_id) REFERENCES folders(id)
+                ON DELETE SET NULL
+                ON UPDATE CASCADE
         )",
         [],
     )?;

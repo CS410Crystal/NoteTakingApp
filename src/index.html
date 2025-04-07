@@ -66,7 +66,7 @@
   </div>
 
   <!-- NEW NOTE DIALOG-->
-  <div id="newNoteDialog" class="newNoteDialog">
+  <div id="newNoteDialog" class="newNoteDialog" data=>
     <div class="newNoteDialog-content" style="margin:auto; transform: translate(0%,80%);">
       <p>Enter the name of the new note:</p>
       <input type="text" id="newNoteName" name="newNoteName" placeholder="Note name">
@@ -108,7 +108,8 @@
     <div id="edit-tab">
       <div id="edit-name">Editing Note Name: {}</div>
       <span>Change Name:<input id="input-edit-name"></span>
-      <button id="edit-tab_close">Close Edit</button>
+      <button id="edit-tab-close">Close Edit</button>
+      <button id="edit-tab-addToFolder">Add to Folder...</button>
       <button id="edit-tab-save">Save Note</button><span id="edit-tab-save-status"
         style="color:black; visibility: hidden;">Saved!</span>
       <textarea id="edit_note" style="height: 90%; width: 100%;"></textarea>
@@ -120,7 +121,7 @@
     <div id="folder-edit-tab">
       <div id="folder-edit-name">Editing Folder Name: {}</div>
       <span>Change Name:<input id="input-edit-name-folder"></span>
-      <button id="folder-edit-tab_close">Close Edit</button>
+      <button id="folder-edit-tab-close">Close Edit</button>
       <button id="folder-edit-tab-save">Save Folder</button><span id="edit-tab-folder-save-status"
         style="color:black; visibility: hidden;">Saved!</span>
       <!-- <textarea id="edit_folder" style="height: 90%; width: 100%;"></textarea> -->
