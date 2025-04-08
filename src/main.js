@@ -292,6 +292,7 @@ function create_note_element(note) {
   // If it’s stored in seconds, multiply by 1000 if needed
   // For consistency, let's do:
   lastdate.innerText = timeAgo(note[3] * 1000);
+  lastdate.dataset.lastUpdated = note[3];
   note_element.appendChild(lastdate);
 
   // If content is PDF, display PDF; otherwise, open text editor
@@ -564,16 +565,20 @@ function dateSort() {
   let checkBox = document.getElementById("dateSort");
   let notes = document.querySelectorAll(".note");
 
-  if (checkBox.checked === true) {
-    notes.forEach(note => {
-      note.parentElement.style.display = "none";
-    });
-  } else {
-    notes.forEach(note => {
-      note.parentElement.style.display = "block";
-    });
-  }
+  const elements = Array.from(notes).map(note => {
+    const parent = note.parentElement;
+    const lastUpdatedDiv = parent.querySelector(".lastdate");
+    const time = Number(lastUpdatedDiv.dataset.lastUpdated) || 0;
+    return { element: parent, time: time };
+  });
+
+  // Sort descending if checked (most recent first), ascending if unchecked
+  elements.sort((a, b) => checkBox.checked ? b.time - a.time : a.time - b.time);
+
+  const parent = notes_list;
+  elements.forEach(item => parent.appendChild(item.element));
 }
+
 
 function showFolders() {
   notes_list.innerHTML = "";
