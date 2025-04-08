@@ -59,6 +59,22 @@ function createNewFolder() {
       console.error("Error creating folder:", error);
       alert("Failed to create folder.");
     });
+    // refresh the folder list
+  notes_list.innerHTML = "";
+  invoke("get_folders").then((response) => {
+    console.log(response)
+    let folders = response;
+    // let folders = JSON.parse(response);
+    if (folders.length === 0) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.innerText = "No folders available.";
+      notes_list.appendChild(emptyMessage);
+    }
+    for (const folder of folders) {
+      let folder_element = create_folder_element(folder);
+      notes_list.appendChild(folder_element);
+    }
+  });
 }
 
 
