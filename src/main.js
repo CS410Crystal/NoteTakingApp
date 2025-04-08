@@ -278,7 +278,9 @@ function create_note_element(note) {
   note_element.style.width = "200px";
   note_element.style.height = "200px";
   note_element.style.padding = "10px";
-
+  note_element.classList.add("note_element")
+  note_element.value = note[0];
+  
   let button = document.createElement("button");
   button.style.width = "200px";
   button.style.height = "200px";
@@ -331,6 +333,15 @@ function create_note_element(note) {
 const input_edit_name_folder = document.getElementById("input-edit-name-folder")
 
 const note_list = document.getElementById("folder-note-list");
+const folder_banner = document.getElementById("folder_banner");
+
+document.getElementById("folder_banner_close").addEventListener("click",function() {
+  let notes_to_check = document.querySelectorAll(".note_element")
+  for (let i = 0; i < notes_to_check.length; ++i) {
+    notes_to_check[i].style.removeProperty("display")
+  }
+  folder_banner.style.removeProperty("display")
+})
 
 function create_folder_element(folder) {
   let folder_element = document.createElement("div");
@@ -359,7 +370,52 @@ function create_folder_element(folder) {
   folder_element.addEventListener("mouseout", function () {
     folder_edit_element.style.visibility = "hidden"
   })
+  folder_element.addEventListener("click", function (e) {
+    if (e.target != folder_element) {
+      return
+    }
+    //update folder data
+    invoke("db_get_folder_by_id", { id: folder[0] }).then((response) => {
+      let folder_response = response;
+      folder[1] = folder_response[1];
+      folder[2] = folder_response[2];
+      folder[3] = folder_response[3];
+      folder_banner.style.display = "block"
+      folder_banner.childNodes[0].nodeValue = "Current Folder: " + folder[1];
+      //hide saves based on reference_list
+      // console.log(folder[2])
+      let notes_to_check = document.querySelectorAll(".note_element")
+      let reference_list = JSON.parse(folder[2]);
 
+      for (let i = 0; i < notes_to_check.length; ++i) {
+        notes_to_check[i].style.display = "none"
+      }
+      for (let i = 0; i < notes_to_check.length; ++i) {
+        let match_id = notes_to_check[i].value
+
+        let found_index = undefined
+        for (let j = 0; j < reference_list.length; ++j) {
+          if (reference_list[j] == match_id) {
+            notes_to_check[i].checked = true;
+            found_index = j;
+            notes_to_check[i].style.removeProperty("display")
+            break;
+          }
+        }
+        if (found_index != undefined) {
+          reference_list.splice(found_index, 1);
+        }
+        if (reference_list.length == 0) {
+          break;
+        }
+      }
+
+      //loop all saves
+      
+    }
+    )
+    
+  })
   folder_edit_element.addEventListener("click", function () {
     // alert(`Opening folder: ${folder[1]}`);
     let edit_folder_container = document.getElementById("edit-folder-container");
@@ -387,7 +443,7 @@ function create_folder_element(folder) {
 
 
     invoke("db_get_folder_by_id", { id: folder[0] }).then((response) => {
-      if (response !== "note not found") {
+      if (response !== "folder not found") {
         let folder_response = response;
         edit_folder_container.style.display = "block";
         edit_name.innerText = "Editing Note Name: " + folder_response[1];
