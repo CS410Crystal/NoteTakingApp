@@ -67,11 +67,11 @@ pub fn create_folder_in_db (name: &str) -> Result<i32, String> {
 }
 
 #[tauri::command]
-pub fn delete_folder_from_db(id: i32) -> Result<(), String> {
+pub fn delete_folder_from_db(id: i32) -> Result<bool, String> {
     println!("Tried to run delete_folder_from_db");
     let conn = create_connection().map_err(|e| e.to_string())?;
     conn.execute("DELETE FROM folders WHERE id = ?1", params![id]).map_err(|e| e.to_string())?;
-    Ok(())
+    Ok(true)
 }
 //
 
@@ -147,7 +147,7 @@ pub fn get_notes_from_dbManager() -> Result<Vec<(i32, String, String, i64)>, Str
     }
     //print the notes
     for note in &notes {
-        println!("Got From Manager:\n Note ID: {}, name: {}, content: {}, last_updated: {}", note.0, note.1, note.2, note.3);
+        println!("Got From Manager:\n Note ID: {}, name: {}, last_updated: {}", note.0, note.1, note.3);
     }
     Ok(notes)
 }

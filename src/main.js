@@ -32,6 +32,9 @@ function displayExistingFolders() {
 function closeExistingFoldersDisplay() {
   document.getElementById("existingFoldersDisplay").style.display = "none";
 }
+
+let current_folder_filter = undefined
+
 // THOUGHTS?
 function createNewFolder() {
   const folderName = document.getElementById("newFolderName").value;
@@ -126,7 +129,16 @@ const notes_list = document.getElementById("notes_list");//where is notes_list d
 // JJ: NEW CODE START
 function loadNotes() {
   scaleHeight();
-  console.log("invoke load_data_from_db");
+  console.log("loading notes and folders")
+  invoke("get_folders").then((response) => {
+    console.log(response)
+    let folders = response;
+    // let folders = JSON.parse(response);
+    for (const folder of folders) {
+      let folder_element = create_folder_element(folder);
+      notes_list.appendChild(folder_element);
+    }
+  });
   invoke("load_data_from_db").then(() => {
     console.log("invoke get_notes_from_dbManager");
     invoke("get_notes_from_dbManager").then((response) => {
@@ -135,17 +147,8 @@ function loadNotes() {
         let note_element = create_note_element(note);
         notes_list.appendChild(note_element);
       }
+      dateSort();
     })
-    invoke("get_folders").then((response) => {
-      console.log(response)
-      let folders = response;
-      // let folders = JSON.parse(response);
-      for (const folder of folders) {
-        let folder_element = create_folder_element(folder);
-        notes_list.appendChild(folder_element);
-      }
-    });
-
   })
 }
 
@@ -357,6 +360,7 @@ document.getElementById("folder_banner_close").addEventListener("click",function
     notes_to_check[i].style.removeProperty("display")
   }
   folder_banner.style.removeProperty("display")
+  current_folder_filter = undefined
 })
 
 function create_folder_element(folder) {
@@ -402,7 +406,7 @@ function create_folder_element(folder) {
       // console.log(folder[2])
       let notes_to_check = document.querySelectorAll(".note_element")
       let reference_list = JSON.parse(folder[2]);
-
+      current_folder_filter = JSON.parse(JSON.stringify(reference_list));
       for (let i = 0; i < notes_to_check.length; ++i) {
         notes_to_check[i].style.display = "none"
       }
@@ -425,9 +429,6 @@ function create_folder_element(folder) {
           break;
         }
       }
-
-      //loop all saves
-      
     }
     )
     
@@ -571,7 +572,7 @@ function create_note_element_for_folder(note) {
 
 //delete folder from the database
 document.getElementById("delete_folder").addEventListener("click", function() {
-  print("delete folder");
+  console.log("delete folder");
   if (!currently_editing_folder) {
     return;
   }
@@ -605,7 +606,7 @@ document.getElementById("delete_folder").addEventListener("click", function() {
   //close the edit note dialog
   edit_container.style.removeProperty("display");
   edit_name.innerText = "Editing Note Name: {}";
-  currently_editing_folder_element.parentElement.remove();
+  // currently_editing_folder_element.parentElement.remove();
   currently_editing_folder_element = null;
 }
 )
@@ -643,13 +644,14 @@ function dateSort() {
     const time = Number(lastUpdatedDiv.dataset.lastUpdated) || 0;
     return { element: parent, time: time };
   });
-
+  console.log(elements)
   // Sort descending if checked (most recent first), ascending if unchecked
-  elements.sort((a, b) => checkBox.checked ? b.time - a.time : a.time - b.time);
+  elements.sort((a, b) => checkBox.checked ? a.time - b.time : b.time - a.time);
 
   const parent = notes_list;
   elements.forEach(item => parent.appendChild(item.element));
 }
+
 
 
 function showFolders() {
@@ -684,6 +686,35 @@ function showNotes() {
       // and note[1] as "last_updated"
       let note_element = create_note_element(note);
       notes_list.appendChild(note_element);
+    }
+
+    if (current_folder_filter != undefined) {
+      console.log(current_folder_filter)
+      let notes_to_check = document.querySelectorAll(".note_element")
+      for (let i = 0; i < notes_to_check.length; ++i) {
+        notes_to_check[i].style.display = "none"
+      }
+      let reference_list = current_folder_filter;
+      for (let i = 0; i < notes_to_check.length; ++i) {
+        let match_id = notes_to_check[i].value
+
+        let found_index = undefined
+        for (let j = 0; j < reference_list.length; ++j) {
+          if (reference_list[j] == match_id) {
+            notes_to_check[i].checked = true;
+            found_index = j;
+            notes_to_check[i].style.removeProperty("display")
+            break;
+          }
+        }
+        if (found_index != undefined) {
+          reference_list.splice(found_index, 1);
+        }
+        if (reference_list.length == 0) {
+          break;
+        }
+      }
+
     }
   });
 }
