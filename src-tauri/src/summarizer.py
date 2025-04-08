@@ -1,4 +1,10 @@
-#use hugging face transformers to summarize text
+#file to summarize text files using a pre-trained model
+# This script uses the Hugging Face Transformers library to summarize text files.
+# It loads a pre-trained model and uses it to generate summaries of the input text.
+
+# takes in a text file, summarizes it, and saves the summary to another text file
+
+#need to figure out dependencies to work with rest of project
 import transformers
 from transformers import pipeline
 import os
@@ -25,21 +31,21 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Error summarizing text: {e}")
             return text  # Return the original text if summarization fails
-    # Function to read text from a file
+    #read text from a file
     def read_text_file(file_path: str) -> str:
         """
         Read text from a file.
         """
         with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
-    # Function to write text to a file
+    #write text to a file
     def write_text_file(file_path: str, text: str):
         """
         Write text to a file.
         """
         with open(file_path, 'w', encoding='utf-8') as file:
             file.write(text)
-    # Function to summarize a file
+    #summarize a file
     def summarize_file(input_file: str, output_file: str):
         """
         Summarize a file and save the summary to another file.
@@ -49,7 +55,7 @@ if __name__ == "__main__":
         write_text_file(output_file, summary)
         logger.info(f"Summarized {input_file} and saved to {output_file}")
 
-    # main function to handle command line arguments
+    #main function to handle command line arguments
     def main():
         import argparse
         parser = argparse.ArgumentParser(description="Summarize text files.")
@@ -58,10 +64,6 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
         summarize_file(args.input_file, args.output_file)
-    # Run the main function if the script is executed directly
+    #main function if the script is executed directly
     if __name__ == "__main__":
         main()
-    # Example usage
-    # input_file = "input.txt"
-    # output_file = "output.txt"
-    # summarize_file(input_file, output_file)
